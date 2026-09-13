@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 StatusName = Literal[
-    "installed",
+    "platform",
     "adapter",
     "contract",
     "schema",
@@ -25,3 +25,4 @@ class StatusDiagnostics:
     compatible_schemas: tuple[str, ...]
     storage: str | None
     latest_ingestion: str
+    platform: str

@@ -55,6 +55,7 @@ class ApplicationContainer:
             compatible_schemas=self.compatible_schemas,
             storage=self.storage,
             latest_ingestion=self.latest_ingestion,
+            platform="stock-research",
         )
 
     def configure_provider(
