@@ -371,18 +371,18 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated checks aggregate exactly scope/version/issues/status/time; run the file with pytest.
     - **Property 40: Quality reports are complete aggregations.**
     - **Validates: Requirements 9.13**
-  - [ ] 7.17 Implement resumable ingestion orchestration and conserved run accounting
+  - [x] 7.17 Implement resumable ingestion orchestration and conserved run accounting
     - **Affected modules:** `src/stock_platform/application/ingestion.py`, provider/repository/publisher ports, integration tests.
     - **Prerequisites:** 5.4, 6.15, 7.4, 7.6, 7.10, 7.12.
     - **Expected output / verify:** Preflight-to-fetch-to-normalize-to-quality-to-publish flow, ephemeral retention branch, mutually exclusive counts, partial finalized commits, provider failure boundary, and resume idempotency; run focused integration tests.
     - _Requirements: 2.2-2.8, 4.1, 4.4, 6.5, 7.1-7.10, 9.13, 14.6_
-  - [ ] 7.18 Write Property 28 test for exclusive conserved ingestion counts
+  - [x] 7.18 Write Property 28 test for exclusive conserved ingestion counts
     - **Affected modules:** `tests/property/test_property_28_ingestion_counts.py`.
     - **Prerequisites:** 7.17, 1.2.
     - **Expected output / verify:** Generated outcomes belong to one category and sum to requested; run the file with pytest.
     - **Property 28: Ingestion outcome counts are exclusive and conserved.**
     - **Validates: Requirements 7.5**
-  - [ ] 7.19 Write Property 31 test for resume finalized-date complement
+  - [x] 7.19 Write Property 31 test for resume finalized-date complement
     - **Affected modules:** `tests/property/test_property_31_ingestion_resume.py`.
     - **Prerequisites:** 7.17, 1.2.
     - **Expected output / verify:** Stateful interruptions request exactly unfinalized dates from boundary and preserve finalized IDs; run the file with pytest.
