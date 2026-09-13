@@ -9,6 +9,7 @@ from stock_platform.domain.research import (
     ResearchManifest,
     canonical_business_id,
     missing_replay_artifacts,
+    project_snapshot,
 )
 
 
@@ -62,6 +63,14 @@ def test_missing_replay_artifacts_are_complete() -> None:
     )
 
     assert missing == ()
+
+
+def test_project_snapshot_only_uses_manifest_projection() -> None:
+    snapshot = _snapshot()
+
+    projection = project_snapshot(snapshot)
+
+    assert projection.manifest is snapshot
 
 
 def test_canonical_business_id_uses_utc() -> None:

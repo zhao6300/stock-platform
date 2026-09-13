@@ -123,6 +123,30 @@ class MissingReplayArtifact:
 type ReplayInput = dict[str, Any]
 
 
+@dataclass(frozen=True, slots=True)
+class SnapshotProjection:
+    """The read-only value that a data snapshot expresses in observability."""
+
+    manifest: DataSnapshotManifest | None
+    dataset_version_id: str | None
+    calendar_versions: tuple[str, ...]
+
+
+def project_snapshot(snapshot: DataSnapshotManifest | None) -> SnapshotProjection:
+    """Return the simple manifest projection without inventing dataset rows."""
+    if snapshot is None:
+        return SnapshotProjection(
+            manifest=None,
+            dataset_version_id=None,
+            calendar_versions=(),
+        )
+    return SnapshotProjection(
+        manifest=snapshot,
+        dataset_version_id=snapshot.dataset_version_id,
+        calendar_versions=snapshot.calendar_versions,
+    )
+
+
 def missing_replay_artifacts(
     manifest: ResearchManifest,
     snapshot: DataSnapshotManifest | None,
