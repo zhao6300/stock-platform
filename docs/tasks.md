@@ -667,7 +667,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 13.1, 6.11.
     - **Expected output / verify:** Password-derived AES-256-GCM capsule is complete only after encryption verification; any failure deletes all current-operation output and preserves prior data; run focused tests.
     - _Requirements: 13.9-13.10_
-  - [x] 13.4 Implement compatibility-gated atomic restore with rollback bundle
+  - [ ] 13.4 Implement compatibility-gated atomic restore with rollback bundle
     - **Affected modules:** `src/stock_platform/infrastructure/backup/restore.py`, integration tests.
     - **Prerequisites:** 13.1.
     - **Expected output / verify:** Preflight verifies schema/counts/checksums, restores every item to a new directory, re-verifies, atomically switches, and returns unchanged pre-state on any failure; run focused fault tests.
