@@ -6,9 +6,8 @@ from decimal import Decimal
 from hypothesis import given
 from hypothesis import strategies as st
 
-from stock_platform.domain.ingestion import DailyBar
-from stock_platform.domain.ingestion import FundNav
-from stock_platform.domain.quality import QualityService, QualityStatus, maximum_status
+from stock_platform.domain.ingestion import DailyBar, FundNav
+from stock_platform.domain.quality import QualityService
 
 
 @given(
@@ -51,7 +50,7 @@ def test_daily_bar_quality_issues_record_complete_evidence(
     observation_date=st.dates(),
     quantity=st.integers(min_value=0, max_value=3),
 )
-def test_fund_nav_quality_evidence_includes_each_field(  # noqa: PLR0913
+def test_fund_nav_quality_evidence_includes_each_field(
     observation_date: date,
     quantity: int,
 ) -> None:

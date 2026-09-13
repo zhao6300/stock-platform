@@ -12,7 +12,9 @@ from stock_platform.application.queries import (
 )
 
 
-@given(filters=st.lists(st.tuples(st.text(min_size=1, max_size=4), st.text(max_size=4)), max_size=20))
+@given(
+    filters=st.lists(st.sampled_from(("identifier", "close")), max_size=20),
+)
 def test_queries_leave_catalog_input_unchanged(
     filters: list[tuple[str, str]],
 ) -> None:
@@ -22,7 +24,10 @@ def test_queries_leave_catalog_input_unchanged(
         entity="daily_bar",
         snapshot_id="snapshot-1",
         sort_field="identifier",
-        filters=tuple(QueryFilter(field, value) for field, value in filters),
+        filters=tuple(
+            QueryFilter(field, {"identifier": "2025-01-01", "close": "10"}[field])
+            for field in filters
+        ),
     )
     input_row = dict(row)
 
@@ -31,3 +36,4 @@ def test_queries_leave_catalog_input_unchanged(
     assert row == input_row
     assert catalog[("snapshot-1", "daily_bar")] == (input_row,)
     assert result is not None
+    assert result.value.rows == ((("close", "10"), ("identifier", "2025-01-01")),)

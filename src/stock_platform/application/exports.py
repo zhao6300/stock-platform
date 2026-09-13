@@ -3,8 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from stock_platform.domain.compliance import ComplianceProfileVersion
-from stock_platform.domain.exports import RetentionPermission
+from stock_platform.domain.compliance import (
+    ComplianceProfileVersion,
+    ExportPermission,
+    RetentionPermission,
+)
 
 type ExportCategory = Literal[
     "RAW_PROVIDER_DATA",
@@ -15,8 +18,12 @@ type ExportCategory = Literal[
 _PERMITTED_EXPORT_CATEGORIES: dict[ExportPermission, frozenset[ExportCategory]] = {
     "PROHIBITED": frozenset(),
     "DERIVED_RESULTS_ONLY": frozenset({"DERIVED_RESULTS"}),
-    "NORMALIZED_PROVIDER_DATA": frozenset({"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA"}),
-    "RAW_PROVIDER_DATA": frozenset({"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA", "RAW_PROVIDER_DATA"}),
+    "NORMALIZED_PROVIDER_DATA": frozenset(
+        {"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA"}
+    ),
+    "RAW_PROVIDER_DATA": frozenset(
+        {"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA", "RAW_PROVIDER_DATA"}
+    ),
 }
 
 

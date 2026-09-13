@@ -278,7 +278,7 @@ class BacktestEngine:
         trades: list[TradeRecord] = []
         valuations: list[ValuationRecord] = []
         performances: list[PerformanceRecord] = []
-        previous_value: Decimal | None = None
+        previous_value = Decimal(0)
         running_max: Decimal | None = None
         pending: list[PendingSignal] = []
 
@@ -327,27 +327,30 @@ class BacktestEngine:
                 valuation = self._value_instrument(trading_date, instrument, bars.get(instrument), positions.get(instrument, Decimal(0)))
                 valuations.append(valuation)
             universe = self._universe()
-            unavailable = any(not row.valuation_available for row in valuations[-len(universe):])
-            portfolio_value = None if unavailable else sum(
-                (row.value for row in valuations[-len(universe):]), Decimal(0)
-            ) + cash
-            if portfolio_value is None:
-                performance = PerformanceRecord(trading_date, False, None, None, None)
-            else:
-                simple_return = (
-                    None if previous_value is None or previous_value == 0 else portfolio_value / previous_value - 1
-                )
-                if previous_value is not None and previous_value != 0:
+            universe_values = [
+                row.value
+                for row in valuations[-len(universe) :]
+                if row.valuation_available and row.value is not None
+            ]
+            unavailable = any(
+                not row.valuation_available or row.value is None
+                for row in valuations[-len(universe) :]
+            )
+
+            if not unavailable:
+                portfolio_value = sum(universe_values, Decimal(0)) + cash
+                simple_return = None if previous_value == 0 else portfolio_value / previous_value - 1
+                if previous_value != 0:
                     if running_max is None or portfolio_value > running_max:
                         running_max = portfolio_value
                     drawdown = portfolio_value / running_max - 1
                 else:
-                    running_max = Decimal(0) if previous_value == 0 else running_max
                     drawdown = None
                 performance = PerformanceRecord(trading_date, True, portfolio_value, simple_return, drawdown)
-            if performance.available:
                 previous_value = portfolio_value
                 running_max = max(running_max or Decimal(0), portfolio_value)
+            else:
+                performance = PerformanceRecord(trading_date, False, None, None, None)
             performances.append(performance)
 
         survivorship = any(
@@ -432,7 +435,7 @@ class BacktestEngine:
         tradability: Tradability | None,
         held_quantity: Decimal,
         cash: Decimal,
-    ) -> tuple[TradeRecord, Decimal, Decimal, Decimal]:
+    ) -> tuple[TradeRecord, Decimal | None, Decimal, Decimal]:
         if bar is None or bar.close <= 0 or signal.requested_quantity <= 0:
             return self._blocked_trade(trading_date, signal, "INVALID_REQUEST")
         blocked = self._blocked_reason(tradability, signal.direction, held_quantity)
@@ -525,7 +528,8 @@ class BacktestEngine:
             close = None
         else:
             source_date = self._fallback_date(trading_date, instrument)
-            close = self._bar(source_date, instrument).close if source_date is not None else None
+            fallback_bar = self._bar(source_date, instrument) if source_date is not None else None
+            close = fallback_bar.close if fallback_bar is not None else None
         value = None if close is None else quantity * close
         return ValuationRecord(
             trading_date=trading_date,
