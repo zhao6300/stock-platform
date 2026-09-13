@@ -688,29 +688,29 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 13.2-13.6.
     - **Expected output / verify:** Minimal full-state round trip plus injected failure at every copy/encrypt/verify/switch/migrate point proves record counts, checksums, cleanup, and rollback tree hash; run `python -m pytest tests/integration/backup_restore -q`.
     - _Requirements: 13.9-13.10, 14.2-14.5, 14.7-14.9_
-  - [ ] 13.8 Add macOS owner-permission and Keychain smoke tests
+  - [x] 13.8 Add macOS owner-permission and Keychain smoke tests
     - **Affected modules:** `tests/smoke/macos/`, CI/local smoke markers.
     - **Prerequisites:** 6.11, 13.3, 13.7.
     - **Expected output / verify:** Opt-in macOS tests verify owner-only data/log/backup permissions, Keychain process access, no plaintext in project/SQLite/default backup, and encrypted capsule behavior; run `python -m pytest tests/smoke/macos -m macos -q` on macOS.
     - _Requirements: 1.3, 13.1-13.3, 13.9-13.10_
 
 - [ ] 14. Complete integration, security, and acceptance validation
-  - [ ] 14.1 Build one deterministic local end-to-end acceptance fixture
+  - [x] 14.1 Build one deterministic local end-to-end acceptance fixture
     - **Affected modules:** `tests/acceptance/test_local_research_workflow.py`, fixture adapter/data.
     - **Prerequisites:** 7.21, 8.9, 9.3, 10.8, 11.12, 12.4, 13.7.
     - **Expected output / verify:** Offline fake-provider workflow configures compliance/credential, registers/calendar/maps, ingests, checks quality, snapshots, analyzes, backtests, replays, backs up/restores, and verifies provenance/labels without public network; run the acceptance file.
     - _Requirements: 1.1-14.9_
-  - [ ] 14.2 Add adversarial local security acceptance tests
+  - [x] 14.2 Add adversarial local security acceptance tests
     - **Affected modules:** `tests/security/`.
     - **Prerequisites:** 6.10, 6.12-6.15, 12.4, 13.8.
     - **Expected output / verify:** Tests cover second UID, non-loopback, CSRF, endpoint/DNS/redirect encodings, secret variants, arbitrary query/file access, CLI argv leakage, and absent trading interfaces; run `python -m pytest tests/security -q`.
     - _Requirements: 1.1-1.6, 13.1-13.10_
-  - [ ] 14.3 Add executable acceptance-criteria coverage and property-label audit
+  - [x] 14.3 Add executable acceptance-criteria coverage and property-label audit
     - **Affected modules:** `tests/architecture/test_requirement_traceability.py`, test markers/metadata.
     - **Prerequisites:** 14.1, 14.2.
     - **Expected output / verify:** Machine-readable audit proves every criterion 1.1 through 14.9 maps to at least one test and each Property 1-65 has exactly one primary Hypothesis test with required feature/property annotation; run the audit test.
     - _Requirements: 1.1-14.9_
-  - [ ] 14.4 Run the final deterministic validation gate
+  - [x] 14.4 Run the final deterministic validation gate
     - **Affected modules:** test/build configuration only if a failing check exposes a configuration defect; do not add scope.
     - **Prerequisites:** 14.3.
     - **Expected output / verify:** `python -m ruff check src tests`, `python -m mypy src`, `python -m pytest -q`, `python -m build`, and `python -m pip check` all pass; macOS smoke result is recorded separately when the environment supports Keychain.
