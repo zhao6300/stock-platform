@@ -55,18 +55,18 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Closed four-value instrument type and market-aware instrument values reject aliases/other types; run `python -m pytest tests/unit/domain/test_instruments.py -q`.
     - _Requirements: 2.1, 5.9_
-  - [ ] 3.2 Write Property 4 test for total, exclusive instrument classification
+  - [x] 3.2 Write Property 4 test for total, exclusive instrument classification
     - **Affected modules:** `tests/property/test_property_04_instrument_classification.py`.
     - **Prerequisites:** 3.1, 1.2.
     - **Expected output / verify:** Generated supported and unsupported values prove exact classification; run `python -m pytest tests/property/test_property_04_instrument_classification.py -q`.
     - **Property 4: Instrument classification is total and exclusive over the supported domain.**
     - **Validates: Requirements 2.1**
-  - [ ] 3.3 Implement canonical security identities, master versions, mappings, and resolver
+  - [x] 3.3 Implement canonical security identities, master versions, mappings, and resolver
     - **Affected modules:** `src/stock_platform/domain/identifiers.py`, `tests/unit/domain/test_identifiers.py`.
     - **Prerequisites:** 3.1.
     - **Expected output / verify:** Pure registration/version/closed-interval resolution operations produce resolved, unresolved, or ambiguous typed results and aggregate validation errors; run `python -m pytest tests/unit/domain/test_identifiers.py -q`.
     - _Requirements: 5.1-5.9_
-  - [ ] 3.4 Write Property 18 test for stable canonical-security bijection
+  - [x] 3.4 Write Property 18 test for stable canonical-security bijection
     - **Affected modules:** `tests/property/test_property_18_security_bijection.py`.
     - **Prerequisites:** 3.3, 1.2.
     - **Expected output / verify:** Stateful registration and lifecycle changes preserve one-to-one identity assignment; run the file with pytest.
@@ -78,7 +78,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated invalid field combinations report all violations and preserve state; run the file with pytest.
     - **Property 19: Identifier writes are valid or atomic failures.**
     - **Validates: Requirements 5.3, 5.9**
-  - [ ] 3.6 Write Property 20 test for mapping-resolution trichotomy
+  - [x] 3.6 Write Property 20 test for mapping-resolution trichotomy
     - **Affected modules:** `tests/property/test_property_20_mapping_trichotomy.py`.
     - **Prerequisites:** 3.3, 1.2.
     - **Expected output / verify:** Arbitrary mapping sets return exactly one disjoint result with complete match details; run the file with pytest.
@@ -194,7 +194,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 2.8, 4.9, 5.2, 7.2-7.3, 8.1_
 
 - [ ] 6. Implement provider, network, credential, and secret boundaries
-  - [ ] 6.1 Define and load the versioned Provider Adapter contract
+  - [x] 6.1 Define and load the versioned Provider Adapter contract
     - **Affected modules:** `src/stock_platform/providers/contract.py`, `registry.py`, `tests/unit/providers/test_contract.py`.
     - **Prerequisites:** 1.3, 3.1.
     - **Expected output / verify:** Entry-point discovery, singular declared version, required members, compatibility state, explicit allowlist, and no repository/network bypass; run focused tests.
@@ -205,7 +205,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated malformed adapter shapes load only when one declared contract is fully implemented; run the file with pytest.
     - **Property 9: Adapter contract declaration is singular and implemented.**
     - **Validates: Requirements 3.1**
-  - [ ] 6.3 Implement capability reporting and replacement-adapter state transition
+  - [x] 6.3 Implement capability reporting and replacement-adapter state transition
     - **Affected modules:** `src/stock_platform/providers/capabilities.py`, `src/stock_platform/application/providers.py`, unit tests.
     - **Prerequisites:** 6.1.
     - **Expected output / verify:** Known values pass unchanged, unknown is explicit, and replacement enables atomically only after contract/capability/probe success; run focused tests.
@@ -216,7 +216,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** All reported/unreported field combinations preserve exact semantics; run the file with pytest.
     - **Property 10: Capability reporting preserves known and unknown values.**
     - **Validates: Requirements 3.3**
-  - [ ] 6.5 Implement provider envelopes, provenance propagation, and categorized errors
+  - [x] 6.5 Implement provider envelopes, provenance propagation, and categorized errors
     - **Affected modules:** `src/stock_platform/providers/contract.py`, `src/stock_platform/domain/provenance.py`, `src/stock_platform/providers/errors.py`, unit tests.
     - **Prerequisites:** 6.1, 4.6.
     - **Expected output / verify:** Provider IDs/source version/retrieval time remain associated through normalization; rate-limit/unavailable errors carry safe required context; run focused tests.
