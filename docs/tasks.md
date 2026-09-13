@@ -388,13 +388,13 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Stateful interruptions request exactly unfinalized dates from boundary and preserve finalized IDs; run the file with pytest.
     - **Property 31: Resume planning is the finalized-date complement.**
     - **Validates: Requirements 7.10**
-  - [ ] 7.20 Write Property 64 test for exact storage preflight
+  - [x] 7.20 Write Property 64 test for exact storage preflight
     - **Affected modules:** `tests/property/test_property_64_storage_preflight.py`.
     - **Prerequisites:** 7.6, 1.2.
     - **Expected output / verify:** Generated non-negative byte counts proceed iff available >= estimated and otherwise issue no request; run the file with pytest.
     - **Property 64: Storage preflight is exact.**
     - **Validates: Requirements 14.6**
-  - [ ] 7.21 Validate ingestion failure, resume, compliance, and publication integration
+  - [x] 7.21 Validate ingestion failure, resume, compliance, and publication integration
     - **Affected modules:** `tests/integration/ingestion/`.
     - **Prerequisites:** 7.17, 7.18, 7.19, 7.20.
     - **Expected output / verify:** Fake-provider tests cover unavailable/rate-limit, retention prohibited, missing fields, changed/unchanged rows, interruption at every commit point, and resume; run `python -m pytest tests/integration/ingestion -q`.
