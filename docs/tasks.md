@@ -634,7 +634,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 7.17, 9.1, 10.3, 11.10.
     - **Expected output / verify:** One composition root wires ports without domain infrastructure imports; status names installed/adapter/contract/schema/compatible schemas/storage/latest ingestion with explicit no-success; run focused tests.
     - _Requirements: 14.1_
-  - [ ] 12.2 Implement loopback FastAPI routes and Jinja2/HTMX/Plotly research pages
+  - [x] 12.2 Implement loopback FastAPI routes and Jinja2/HTMX/Plotly research pages
     - **Affected modules:** `src/stock_platform/web/`, templates/static assets, API/UI tests.
     - **Prerequisites:** 12.1, 2.1, 4.4, 8.9, 9.4, 10.8, 11.12.
     - **Expected output / verify:** `/api/v1` typed routes and pages expose provider attribution, adjustment/quality labels, preserved prior results, confirmations, and disclaimers; no order/broker/live route; run FastAPI TestClient/browser tests.
@@ -644,7 +644,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 12.1, 2.1, 9.1, 10.8, 11.12.
     - **Expected output / verify:** Design-listed commands call application use cases, secret input avoids argv, queries support JSON, client exposes no DB/write/path handle, and no order/broker command exists; run focused CLI/client tests.
     - _Requirements: 1.3, 1.6, 10.7-10.9, 11.1, 13.1, 13.3_
-  - [ ] 12.4 Validate Web/OpenAPI/CLI local-only and no-trading surfaces
+  - [x] 12.4 Validate Web/OpenAPI/CLI local-only and no-trading surfaces
     - **Affected modules:** `tests/integration/interfaces/`, OpenAPI and CLI snapshots.
     - **Prerequisites:** 12.2, 12.3.
     - **Expected output / verify:** Tests prove loopback/session/CSRF/idempotency behavior, second-user denial, no real-order schema/command, visible research disclaimer, labels, errors, and state preservation; run `python -m pytest tests/integration/interfaces -q`.
