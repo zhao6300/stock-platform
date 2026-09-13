@@ -52,6 +52,7 @@ filterwarnings = ["error"]
 markers = [
   "property: marks properties",
   "requirement_traceability: marks requirement traceability checks",
+  "macos: marks macOS-specific smoke checks",
 ]
 
 [tool.ruff]
