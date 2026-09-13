@@ -677,7 +677,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 13.1, 13.4, 5.1.
     - **Expected output / verify:** Schema/data-layout changes occur only after a restorable backup, execute/verify in a copied work directory, and atomically switch or retain original version/data; run focused tests.
     - _Requirements: 14.2, 14.7_
-  - [ ] 13.6 Write Property 65 test for restore compatibility and verification eligibility
+  - [x] 13.6 Write Property 65 test for restore compatibility and verification eligibility
     - **Affected modules:** `tests/property/test_property_65_restore_eligibility.py`.
     - **Prerequisites:** 13.4, 1.2.
     - **Expected output / verify:** Generated compatibility/count/checksum combinations are eligible iff all pass; rejection lists every failure and preserves state; run the file with pytest.
