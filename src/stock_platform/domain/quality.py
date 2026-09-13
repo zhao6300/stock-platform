@@ -216,6 +216,18 @@ class QualityService:
 
         return tuple(issues)
 
+    def daily_bar_status(
+        self,
+        daily_bar: DailyBar,
+        security_id: str,
+        *,
+        open_on_calendar: bool | None = None,
+    ) -> tuple[tuple[QualityIssue, QualityStatus], ...]:
+        return tuple(
+            (issue, issue.rule.status)
+            for issue in self.daily_bar_issues(daily_bar, security_id, open_on_calendar=open_on_calendar)
+        )
+
     def fund_nav_issues(
         self,
         fund_nav: FundNav,
@@ -288,6 +300,23 @@ class QualityService:
             )
 
         return tuple(issues)
+
+    def fund_nav_status(
+        self,
+        fund_nav: FundNav,
+        security_id: str,
+        *,
+        expected_on_calendar: bool | None = None,
+    ) -> tuple[tuple[QualityIssue, QualityStatus], ...]:
+        """Return fund NAV failed checks paired with rule-declared severities."""
+        return tuple(
+            (issue, issue.rule.status)
+            for issue in self.fund_nav_issues(
+                fund_nav,
+                security_id,
+                expected_on_calendar=expected_on_calendar,
+            )
+        )
 
     def report(
         self,
