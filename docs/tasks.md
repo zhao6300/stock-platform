@@ -72,7 +72,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Stateful registration and lifecycle changes preserve one-to-one identity assignment; run the file with pytest.
     - **Property 18: Canonical security assignment is a stable bijection.**
     - **Validates: Requirements 5.1, 5.2**
-  - [ ] 3.5 Write Property 19 test for atomic identifier writes
+  - [x] 3.5 Write Property 19 test for atomic identifier writes
     - **Affected modules:** `tests/property/test_property_19_identifier_atomicity.py`.
     - **Prerequisites:** 3.3, 1.2.
     - **Expected output / verify:** Generated invalid field combinations report all violations and preserve state; run the file with pytest.
@@ -84,7 +84,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Arbitrary mapping sets return exactly one disjoint result with complete match details; run the file with pytest.
     - **Property 20: Security mapping resolution is a trichotomy.**
     - **Validates: Requirements 5.4-5.6**
-  - [ ] 3.7 Write Property 21 test for complete security history
+  - [x] 3.7 Write Property 21 test for complete security history
     - **Affected modules:** `tests/property/test_property_21_security_history.py`.
     - **Prerequisites:** 3.3, 1.2.
     - **Expected output / verify:** Stateful name/status/mapping changes append versions and retain required master fields; run the file with pytest.
@@ -454,18 +454,18 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 8.1-8.11_
 
 - [ ] 9. Implement read-only querying and analytics
-  - [ ] 9.1 Implement whitelist-only DuckDB/Arrow Research Query Service
+  - [x] 9.1 Implement whitelist-only DuckDB/Arrow Research Query Service
     - **Affected modules:** `src/stock_platform/infrastructure/query/service.py`, `catalog.py`, `src/stock_platform/application/queries.py`, integration tests.
     - **Prerequisites:** 5.4, 7.12, 8.1.
     - **Expected output / verify:** Snapshot-pinned entities/typed filters/stable sort, no arbitrary SQL/path/write access, <=20 filters, <=10,000 rows via 10,001 probe, and complete metadata; run focused tests.
     - _Requirements: 10.7-10.9, 10.13_
-  - [ ] 9.2 Write Property 46 test for read-only research queries
+  - [x] 9.2 Write Property 46 test for read-only research queries
     - **Affected modules:** `tests/property/test_property_46_query_read_only.py`.
     - **Prerequisites:** 9.1, 1.2.
     - **Expected output / verify:** Generated valid queries preserve all control/data-plane hashes; run the file with pytest.
     - **Property 46: Research queries are read-only.**
     - **Validates: Requirements 10.7**
-  - [ ] 9.3 Write Property 47 test for exact query limits and metadata
+  - [x] 9.3 Write Property 47 test for exact query limits and metadata
     - **Affected modules:** `tests/property/test_property_47_query_limits.py`.
     - **Prerequisites:** 9.1, 1.2.
     - **Expected output / verify:** Generated queries prove filter/row limits, counts/parameters/snapshot metadata, exact `has_more`, and prior-result preservation; run the file with pytest.
