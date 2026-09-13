@@ -4,6 +4,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
+from stock_platform.application.backup import BackupPlatformState
 from stock_platform.application.status import StatusDiagnostics
 from stock_platform.domain.research import DataSnapshotManifest, data_snapshot_id
 
@@ -88,3 +89,21 @@ class ApplicationContainer:
             raise LookupError(f"snapshot is not pinned: {snapshot_id}")
         self.reject_confirmations.add(snapshot_id)
         return True
+
+    def backup_platform_state(self) -> BackupPlatformState:
+        """Build the local backup inventory source from current state."""
+        return BackupPlatformState(
+            schema_id=self.schema if self.schema is not None else "schema-v1",
+            configuration=tuple(
+                provider for provider in self.enabled_providers
+            ),
+            security_master_versions=(),
+            security_mappings=(),
+            calendars=(),
+            retained_data=(),
+            quality_reports=(),
+            snapshot_ids=tuple(self.snapshots),
+            manifests=(),
+            research_results=(),
+            credentials=tuple(self.credential_references),
+        )

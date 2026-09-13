@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 
 from stock_platform.domain.common import canonical_json
@@ -54,12 +54,19 @@ def default_backup_manifest(state: BackupPlatformState) -> BackupManifest:
     """Return the required, secret-free default backup inventory."""
     datasets = tuple(_dataset(field, values) for field, values in _required_state_values(state))
     return BackupManifest(
-        schema_id=state.schema_id,
+        schema_id=state.get(
+            "schema_id",
+            "schema-v1",
+            )
+            if isinstance(state, Mapping)
+            else state.schema_id,
         datasets=datasets,
     )
 
 
 def _required_state_values(state: BackupPlatformState) -> Iterator[tuple[str, tuple[str, ...]]]:
     for field in _REQUIRED_STATE_FIELDS:
-        values = getattr(state, field)
+        values = state.get(field) if isinstance(state, Mapping) else getattr(state, field)
+        if values is None:
+            continue
         yield field, tuple(values)

@@ -6,6 +6,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from stock_platform.domain.research import DataObjectReference, DataSnapshotManifest
+from stock_platform.infrastructure.backup.backup import default_backup_manifest
 from stock_platform.web.main import app, container
 
 loopback_client = TestClient(app, client=("127.0.0.1", 51769))
@@ -177,3 +178,15 @@ def test_http_credential_set_and_delete_routes_use_application_services() -> Non
     assert created.json() == {"reference": "credential-b"}
     assert deleted.status_code == status.HTTP_200_OK
     assert deleted.json() == {"deleted": "credential-b"}
+
+
+def test_backup_platform_state_excludes_plaintext_credentials() -> None:
+    container.credential_references = frozenset(("secret-token",))
+    container.configure_provider("boss", {"endpoint": "https://boss.local"})
+
+    state = container.backup_platform_state()
+
+    manifest = default_backup_manifest(state)
+    assert not any("secret-token" in dataset.name for dataset in manifest.datasets)
+    assert any(dataset.name == "configuration" for dataset in manifest.datasets)
+    assert any(dataset.name == "snapshot_ids" for dataset in manifest.datasets)
