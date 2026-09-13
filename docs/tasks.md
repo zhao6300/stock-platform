@@ -177,7 +177,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 5.1.
     - **Expected output / verify:** Repository APIs expose insert/read and explicit legal state transitions only; rollback leaves pre-state unchanged; run focused integration tests.
     - _Requirements: 2.8, 4.3, 4.9, 5.1-5.9, 7.2-7.3, 11.1_
-  - [ ] 5.3 Implement content-addressed immutable Parquet object storage
+  - [x] 5.3 Implement content-addressed immutable Parquet object storage
     - **Affected modules:** `src/stock_platform/infrastructure/parquet/schemas.py`, `object_store.py`, `tests/integration/parquet/`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** `daily_bar.v1`/`fund_nav.v1` schemas, Decimal preservation, temp-write/fsync/schema-row-hash verification, atomic SHA-256 publish, and immutable reads; run focused integration tests.
