@@ -560,18 +560,18 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 9.11, 11.1-11.8_
 
 - [ ] 11. Implement deterministic long-only daily backtesting
-  - [ ] 11.1 Implement Strategy Protocol, as-of Market View, capability preflight, and next-open scheduling
+  - [x] 11.1 Implement Strategy Protocol, as-of Market View, capability preflight, and next-open scheduling
     - **Affected modules:** `src/stock_platform/domain/backtest.py`, `strategy.py`, unit tests.
     - **Prerequisites:** 3.8, 9.1, 10.1, 2.3.
     - **Expected output / verify:** Strategy sees daily data only through close date, unsupported capabilities reject whole run before execution, and signals schedule strictly next pinned-calendar open session; run focused tests.
     - _Requirements: 12.2-12.4, 12.16_
-  - [ ] 11.2 Write Property 54 test for no future/non-daily strategy data
+  - [x] 11.2 Write Property 54 test for no future/non-daily strategy data
     - **Affected modules:** `tests/property/test_property_54_no_lookahead.py`.
     - **Prerequisites:** 11.1, 1.2.
     - **Expected output / verify:** Generated calendars/frequencies/signal dates prove visibility and earliest execution boundaries; run the file with pytest.
     - **Property 54: Signals cannot use future or non-daily data.**
     - **Validates: Requirements 12.2-12.4**
-  - [ ] 11.3 Write Property 59 test for zero-trade unsupported strategies
+  - [x] 11.3 Write Property 59 test for zero-trade unsupported strategies
     - **Affected modules:** `tests/property/test_property_59_unsupported_strategy.py`.
     - **Prerequisites:** 11.1, 1.2.
     - **Expected output / verify:** Every nonempty unsupported subset returns all capabilities, zero trades, and unchanged initial ledger; run the file with pytest.
