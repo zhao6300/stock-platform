@@ -167,12 +167,12 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Validates: Requirements 4.6**
 
 - [ ] 5. Build the SQLite control plane and immutable Parquet data plane
-  - [ ] 5.1 Define SQLAlchemy models, constraints, append-only triggers, and initial Alembic schema
+  - [x] 5.1 Define SQLAlchemy models, constraints, append-only triggers, and initial Alembic schema
     - **Affected modules:** `src/stock_platform/infrastructure/sqlite/models.py`, `repositories.py`, `migrations/versions/`, schema tests.
     - **Prerequisites:** 1.3, 3.3, 3.8, 4.1.
     - **Expected output / verify:** Design-listed control tables, unique/foreign-key/interval/current-observation constraints, legal state transitions, and no secret columns; run `python -m alembic upgrade head` against a temporary DB and schema tests.
     - _Requirements: 2.8, 4.3, 4.9, 5.1-5.8, 6.1-6.2, 7.2-7.4, 11.1-11.3_
-  - [ ] 5.2 Implement typed repositories and SQLite Unit of Work
+  - [x] 5.2 Implement typed repositories and SQLite Unit of Work
     - **Affected modules:** `src/stock_platform/infrastructure/sqlite/repositories.py`, `unit_of_work.py`, repository integration tests.
     - **Prerequisites:** 5.1.
     - **Expected output / verify:** Repository APIs expose insert/read and explicit legal state transitions only; rollback leaves pre-state unchanged; run focused integration tests.
@@ -187,7 +187,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 5.2, 5.3.
     - **Expected output / verify:** Files publish before one SQLite reference transaction; failures expose no half-published dataset and leave only safely reclaimable unreferenced objects; run fault-injection tests.
     - _Requirements: 2.6, 2.8, 7.2-7.3, 7.6_
-  - [ ] 5.5 Validate control/data-plane constraints and immutable publication checkpoint
+  - [x] 5.5 Validate control/data-plane constraints and immutable publication checkpoint
     - **Affected modules:** `tests/integration/storage/test_control_data_plane.py`.
     - **Prerequisites:** 5.4.
     - **Expected output / verify:** Automated test covers append-only enforcement, duplicate keys, transaction rollback, Parquet checksums, and SQLite/Parquet reference consistency; run `python -m pytest tests/integration/storage -q`.
