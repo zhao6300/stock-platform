@@ -49,3 +49,11 @@ def test_manifest_diff_reports_exact_fields() -> None:
         "deterministic_seed",
         "snapshot_id",
     )
+
+
+def test_manifest_diff_reports_same_fields_unchanged() -> None:
+    manifest = _manifest()
+
+    differences = manifest_diff(manifest, manifest)
+
+    assert differences == ()
