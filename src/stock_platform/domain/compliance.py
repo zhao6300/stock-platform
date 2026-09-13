@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import StrEnum
@@ -41,6 +42,42 @@ type ExportPermission = Literal[
 _MAX_PROVIDER_NAME_LENGTH = 128
 _MAX_DATA_SOURCE_LENGTH = 512
 _MAX_PURPOSES = 4
+_MINIMUM_OFFSET = timedelta(hours=-12)
+_MAXIMUM_OFFSET = timedelta(hours=14)
+_PERMITTED_PURPOSES = frozenset(
+    (
+        "PERSONAL_RESEARCH",
+        "ACADEMIC_RESEARCH",
+        "COMMERCIAL_RESEARCH",
+        "REDISTRIBUTION",
+    ),
+)
+_PERMITTED_RETENTION = frozenset(
+    (
+        "PROHIBITED",
+        "NORMALIZED_PROVIDER_DATA",
+        "RAW_AND_NORMALIZED_PROVIDER_DATA",
+    ),
+)
+_PERMITTED_EXPORT = frozenset(
+    (
+        "PROHIBITED",
+        "DERIVED_RESULTS_ONLY",
+        "NORMALIZED_PROVIDER_DATA",
+        "RAW_PROVIDER_DATA",
+    ),
+)
+_EXPORT_PERMISSIONS = frozenset(
+    (
+        "PROHIBITED",
+        "DERIVED_RESULTS_ONLY",
+        "NORMALIZED_PROVIDER_DATA",
+        "RAW_PROVIDER_DATA",
+    ),
+)
+_ACCOUNT_TYPES = frozenset(
+    {item.value for item in AccountType}
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,9 +110,34 @@ class ComplianceValidationFailure:
 
 
 @dataclass(frozen=True, slots=True)
+class RetainedRawResponse:
+    provider: str
+    request_parameters: Mapping[str, str]
+    profile: ComplianceProfileVersion
+    request_time: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class ComplianceProfile:
     profile_id: str
     version: ComplianceProfileVersion
+
+
+class ComplianceHistory:
+    """Append-only version registry for immutable compliance profiles."""
+
+    def __init__(self) -> None:
+        self._versions: list[ComplianceProfileVersion] = []
+
+    def append(self, profile: ComplianceProfileVersion) -> ComplianceProfile:
+        self._versions.append(profile)
+        return ComplianceProfile(profile_id=profile.profile_id, version=profile)
+
+    def profile_history(self) -> tuple[ComplianceProfile, ...]:
+        return tuple(
+            ComplianceProfile(profile_id=profile.profile_id, version=profile)
+            for profile in self._versions
+        )
 
 
 class ComplianceValidator:
@@ -108,6 +170,14 @@ def _invalid_profile_fields(profile: ComplianceProfileVersion) -> frozenset[str]
         invalid.add("permitted_purposes")
     if len(profile.permitted_purposes) != len(set(profile.permitted_purposes)):
         invalid.add("permitted_purposes")
+    if any(purpose not in _PERMITTED_PURPOSES for purpose in profile.permitted_purposes):
+        invalid.add("permitted_purposes")
+    if profile.account_type.value not in _ACCOUNT_TYPES:
+        invalid.add("account_type")
+    if profile.retention_permission not in _PERMITTED_RETENTION:
+        invalid.add("retention_permission")
+    if profile.export_permission not in _EXPORT_PERMISSIONS:
+        invalid.add("export_permission")
     if not _is_legal_confirmation_time(profile.confirmation_time):
         invalid.add("confirmation_time")
     return frozenset(invalid)
@@ -116,7 +186,11 @@ def _invalid_profile_fields(profile: ComplianceProfileVersion) -> frozenset[str]
 def _is_legal_confirmation_time(timestamp: datetime) -> bool:
     if timestamp.tzinfo is None or timestamp.utcoffset() is None:
         return False
+    if timestamp.microsecond:
+        return False
     offset = timestamp.utcoffset()
     if offset is None:
         return False
-    return timedelta(hours=-12) <= offset <= timedelta(hours=14)
+    if not _MINIMUM_OFFSET <= offset <= _MAXIMUM_OFFSET:
+        return False
+    return offset.total_seconds() % 60 == 0
