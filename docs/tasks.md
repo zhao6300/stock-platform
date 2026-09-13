@@ -629,7 +629,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 1.7, 11.1-11.7, 12.1-12.16_
 
 - [ ] 12. Wire application use cases into local Web, CLI, and Python interfaces
-  - [ ] 12.1 Implement application service composition and local status diagnostics
+  - [x] 12.1 Implement application service composition and local status diagnostics
     - **Affected modules:** `src/stock_platform/application/container.py`, `status.py`, `infrastructure/observability/`, tests.
     - **Prerequisites:** 7.17, 9.1, 10.3, 11.10.
     - **Expected output / verify:** One composition root wires ports without domain infrastructure imports; status names installed/adapter/contract/schema/compatible schemas/storage/latest ingestion with explicit no-success; run focused tests.
