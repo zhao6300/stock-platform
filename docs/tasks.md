@@ -718,13 +718,13 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
 
 ## Checkpoints
 
-- [ ] 15. Foundation checkpoint
+- [x] 15. Foundation checkpoint
   - Ensure tasks 1.1-6.15 and their focused tests pass; freeze public domain/provider/storage interfaces before agents start ingestion work, and ask the user if questions arise.
 
-- [ ] 16. Data and research checkpoint
+- [x] 16. Data and research checkpoint
   - Ensure tasks 7.1-10.8 and their focused tests pass; verify no unsafe parallel edits changed foundational interfaces, and ask the user if questions arise.
 
-- [ ] 17. Final checkpoint
+- [x] 17. Final checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Critical Path
