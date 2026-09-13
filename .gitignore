@@ -9,3 +9,4 @@ coverage.xml
 dist/
 build/
 .venv/
+stock_platform.sqlite3
