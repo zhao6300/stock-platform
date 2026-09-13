@@ -199,7 +199,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 1.3, 3.1.
     - **Expected output / verify:** Entry-point discovery, singular declared version, required members, compatibility state, explicit allowlist, and no repository/network bypass; run focused tests.
     - _Requirements: 3.1-3.2, 3.7_
-  - [ ] 6.2 Write Property 9 test for singular implemented adapter contracts
+  - [x] 6.2 Write Property 9 test for singular implemented adapter contracts
     - **Affected modules:** `tests/property/test_property_09_adapter_contract.py`.
     - **Prerequisites:** 6.1, 1.2.
     - **Expected output / verify:** Generated malformed adapter shapes load only when one declared contract is fully implemented; run the file with pytest.
@@ -210,7 +210,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 6.1.
     - **Expected output / verify:** Known values pass unchanged, unknown is explicit, and replacement enables atomically only after contract/capability/probe success; run focused tests.
     - _Requirements: 2.5, 3.3, 3.8_
-  - [ ] 6.4 Write Property 10 test for known/unknown capability reporting
+  - [x] 6.4 Write Property 10 test for known/unknown capability reporting
     - **Affected modules:** `tests/property/test_property_10_capability_reporting.py`.
     - **Prerequisites:** 6.3, 1.2.
     - **Expected output / verify:** All reported/unreported field combinations preserve exact semantics; run the file with pytest.
@@ -221,59 +221,59 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 6.1, 4.6.
     - **Expected output / verify:** Provider IDs/source version/retrieval time remain associated through normalization; rate-limit/unavailable errors carry safe required context; run focused tests.
     - _Requirements: 2.7, 3.4-3.6, 7.4_
-  - [ ] 6.6 Write Property 11 test for normalization provenance preservation
+  - [x] 6.6 Write Property 11 test for normalization provenance preservation
     - **Affected modules:** `tests/property/test_property_11_provider_provenance.py`.
     - **Prerequisites:** 6.5, 1.2.
     - **Expected output / verify:** Generated envelopes preserve every required provenance value through a normalized row; run the file with pytest.
     - **Property 11: Provider provenance survives normalization.**
     - **Validates: Requirements 3.4, 7.4**
-  - [ ] 6.7 Write Property 12 test for complete rate-limit translation
+  - [x] 6.7 Write Property 12 test for complete rate-limit translation
     - **Affected modules:** `tests/property/test_property_12_rate_limit_translation.py`.
     - **Prerequisites:** 6.5, 1.2.
     - **Expected output / verify:** Generated throttling responses include provider/category/retry eligibility and conditional correlation ID; run the file with pytest.
     - **Property 12: Rate-limit translation is complete.**
     - **Validates: Requirements 3.5, 3.6**
-  - [ ] 6.8 Write Property 13 test for incompatible-adapter request prevention
+  - [x] 6.8 Write Property 13 test for incompatible-adapter request prevention
     - **Affected modules:** `tests/property/test_property_13_adapter_compatibility.py`.
     - **Prerequisites:** 6.3, 1.2.
     - **Expected output / verify:** Generated version pairs prove incompatible adapters stay disabled with zero requests and both versions reported; run the file with pytest.
     - **Property 13: Incompatible adapters cannot issue requests.**
     - **Validates: Requirements 3.7**
-  - [ ] 6.9 Implement the endpoint-confined HTTPX Network Gateway
+  - [x] 6.9 Implement the endpoint-confined HTTPX Network Gateway
     - **Affected modules:** `src/stock_platform/infrastructure/network/gateway.py`, `endpoint_policy.py`, fake-transport tests.
     - **Prerequisites:** 6.1, 1.3.
     - **Expected output / verify:** HTTPS origin/base-path normalization, DNS/IP policy, no automatic redirects, every-hop validation, cross-origin stripping, and no transmit before validation; run focused tests without public network.
     - _Requirements: 1.4-1.5, 13.7_
-  - [ ] 6.10 Write Property 2 test for configured endpoint confinement
+  - [x] 6.10 Write Property 2 test for configured endpoint confinement
     - **Affected modules:** `tests/property/test_property_02_endpoint_confinement.py`.
     - **Prerequisites:** 6.9, 1.2.
     - **Expected output / verify:** Generated URLs/redirect chains prove only configured hops transmit and blocked targets preserve state; run the file with pytest.
     - **Property 2: Configured endpoint confinement.**
     - **Validates: Requirements 1.4, 1.5, 13.7**
-  - [ ] 6.11 Implement Keychain credential references, selective deletion, and recursive Secret Redactor
+  - [x] 6.11 Implement Keychain credential references, selective deletion, and recursive Secret Redactor
     - **Affected modules:** `src/stock_platform/infrastructure/secrets/keychain.py`, `redaction.py`, `src/stock_platform/application/credentials.py`, unit tests.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** No plaintext project/DB storage, minimal-scope reads, fixed marker for raw/URL/base64/auth variants, separately selectable deletions, and no-request unavailable result; run focused fake-keyring tests.
     - _Requirements: 13.1-13.6, 13.8_
-  - [ ] 6.12 Write Property 60 test for secret-free observable/persisted sinks
+  - [x] 6.12 Write Property 60 test for secret-free observable/persisted sinks
     - **Affected modules:** `tests/property/test_property_60_secret_redaction.py`.
     - **Prerequisites:** 6.11, 1.2.
     - **Expected output / verify:** Generated secrets/encodings/nested values never survive sink redaction; run the file with pytest.
     - **Property 60: Secrets never reach observable or persisted sinks.**
     - **Validates: Requirements 13.3, 13.8**
-  - [ ] 6.13 Write Property 61 test for exact selective credential deletion
+  - [x] 6.13 Write Property 61 test for exact selective credential deletion
     - **Affected modules:** `tests/property/test_property_61_credential_deletion.py`.
     - **Prerequisites:** 6.11, 1.2.
     - **Expected output / verify:** Arbitrary credential sets/subsets delete exactly selections; run the file with pytest.
     - **Property 61: Credential deletion is exactly selective.**
     - **Validates: Requirements 13.5**
-  - [ ] 6.14 Write Property 62 test for unavailable-credential request prevention
+  - [x] 6.14 Write Property 62 test for unavailable-credential request prevention
     - **Affected modules:** `tests/property/test_property_62_credential_unavailable.py`.
     - **Prerequisites:** 6.11, 6.9, 1.2.
     - **Expected output / verify:** Absent/inaccessible credentials produce zero transport calls and secret-free errors; run the file with pytest.
     - **Property 62: Unavailable credentials prevent requests.**
     - **Validates: Requirements 13.6**
-  - [ ] 6.15 Build the reusable Provider Adapter contract/integration suite
+  - [x] 6.15 Build the reusable Provider Adapter contract/integration suite
     - **Affected modules:** `tests/contracts/providers/`, `tests/integration/network/`.
     - **Prerequisites:** 6.3, 6.5, 6.9, 6.11, 4.1.
     - **Expected output / verify:** Fake reference adapter covers auth, first-request compliance, capabilities, provenance, missing fields, unavailable/rate-limit, correlation ID, redirects, and failed replacement rollback; run `python -m pytest tests/contracts/providers tests/integration/network -q`.
