@@ -95,6 +95,17 @@ def test_apply_replay_avoids_running_when_save_fails() -> None:
     assert result.error.missing[0].kind == "manifest"
 
 
+def test_run_avoids_running_when_save_fails() -> None:
+    runner = ResearchRunner(_repositories())
+    fake_runner = _ResearchRunResult(saved=Failure("save failed"))
+
+    result = runner.run(fake_runner, _manifest())
+
+    assert fake_runner.ran is False
+    assert result is not None
+    assert result.error.missing[0].kind == "manifest"
+
+
 def test_apply_replay_publishes_manifest_when_saved() -> None:
     runner = ResearchRunner(_repositories())
     manifest = _manifest()
