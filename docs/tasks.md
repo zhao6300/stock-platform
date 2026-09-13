@@ -622,7 +622,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated run inputs/universe history/quality usages exactly match report disclosures and warnings; run the file with pytest.
     - **Property 58: Backtest disclosures reflect all affected inputs.**
     - **Validates: Requirements 12.13-12.15**
-  - [ ] 11.12 Validate deterministic backtest integration and golden replay
+  - [x] 11.12 Validate deterministic backtest integration and golden replay
     - **Affected modules:** `tests/integration/backtest/`, deterministic fixtures.
     - **Prerequisites:** 11.2-11.11, 10.8.
     - **Expected output / verify:** Golden run/replay covers scheduling, fills, zero fills, valuation, report-manifest link, sections, disclaimers, and tolerance; run `python -m pytest tests/integration/backtest -q`.
@@ -639,7 +639,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 12.1, 2.1, 4.4, 8.9, 9.4, 10.8, 11.12.
     - **Expected output / verify:** `/api/v1` typed routes and pages expose provider attribution, adjustment/quality labels, preserved prior results, confirmations, and disclaimers; no order/broker/live route; run FastAPI TestClient/browser tests.
     - _Requirements: 1.2, 1.6-1.8, 3.3, 4.7, 8.9, 9.11-9.12, 10.1-10.13, 12.12-12.15, 13.3-13.4, 14.1_
-  - [ ] 12.3 Implement Typer CLI and read-only Python snapshot client
+  - [x] 12.3 Implement Typer CLI and read-only Python snapshot client
     - **Affected modules:** `src/stock_platform/cli/`, `src/stock_platform/client.py`, CLI/client tests.
     - **Prerequisites:** 12.1, 2.1, 9.1, 10.8, 11.12.
     - **Expected output / verify:** Design-listed commands call application use cases, secret input avoids argv, queries support JSON, client exposes no DB/write/path handle, and no order/broker command exists; run focused CLI/client tests.
@@ -667,7 +667,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 13.1, 6.11.
     - **Expected output / verify:** Password-derived AES-256-GCM capsule is complete only after encryption verification; any failure deletes all current-operation output and preserves prior data; run focused tests.
     - _Requirements: 13.9-13.10_
-  - [ ] 13.4 Implement compatibility-gated atomic restore with rollback bundle
+  - [x] 13.4 Implement compatibility-gated atomic restore with rollback bundle
     - **Affected modules:** `src/stock_platform/infrastructure/backup/restore.py`, integration tests.
     - **Prerequisites:** 13.1.
     - **Expected output / verify:** Preflight verifies schema/counts/checksums, restores every item to a new directory, re-verifies, atomically switches, and returns unchanged pre-state on any failure; run focused fault tests.
@@ -683,7 +683,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated compatibility/count/checksum combinations are eligible iff all pass; rejection lists every failure and preserves state; run the file with pytest.
     - **Property 65: Restore eligibility requires complete compatibility and verification.**
     - **Validates: Requirements 14.8, 14.9**
-  - [ ] 13.7 Validate backup/restore/encryption/migration fault matrix
+  - [x] 13.7 Validate backup/restore/encryption/migration fault matrix
     - **Affected modules:** `tests/integration/backup_restore/`.
     - **Prerequisites:** 13.2-13.6.
     - **Expected output / verify:** Minimal full-state round trip plus injected failure at every copy/encrypt/verify/switch/migrate point proves record counts, checksums, cleanup, and rollback tree hash; run `python -m pytest tests/integration/backup_restore -q`.
