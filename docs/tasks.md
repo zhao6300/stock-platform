@@ -280,7 +280,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 2.5, 2.7, 3.1-3.8, 4.1, 13.1-13.8_
 
 - [ ] 7. Implement ingestion, observation versioning, and data quality
-  - [ ] 7.1 Implement Daily Bar and Fund NAV candidate normalization
+  - [x] 7.1 Implement Daily Bar and Fund NAV candidate normalization
     - **Affected modules:** `src/stock_platform/domain/ingestion.py`, `normalization.py`, unit tests.
     - **Prerequisites:** 3.1, 3.8, 6.5.
     - **Expected output / verify:** Decimal parsing, required-field aggregation, calendar/numeric/OHLC/NAV atomic validation, and typed accepted/rejected candidates; run focused unit tests.
@@ -308,7 +308,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated capabilities and requests preserve dataset hash on unsupported pairs; run the file with pytest.
     - **Property 7: Unsupported coverage is non-mutating.**
     - **Validates: Requirements 2.5**
-  - [ ] 7.6 Implement non-refresh, refresh, invalid-range, and storage-preflight planning
+  - [x] 7.6 Implement non-refresh, refresh, invalid-range, and storage-preflight planning
     - **Affected modules:** `src/stock_platform/domain/ingestion.py`, `src/stock_platform/application/ingestion_preflight.py`, unit tests.
     - **Prerequisites:** 3.8, 4.1, 6.3.
     - **Expected output / verify:** Maximal expected-minus-existing segments, full refresh dates, boundary validation before network, compliance/credential/space checks; run focused tests.
