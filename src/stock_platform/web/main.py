@@ -6,6 +6,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
+from jinja2 import BaseLoader, Environment
 from pydantic import BaseModel, Field
 
 from stock_platform.application.container import ApplicationContainer
@@ -17,6 +18,8 @@ from stock_platform.domain.research import (
     DataSnapshotManifest,
 )
 from stock_platform.web.access import enforce_loopback
+
+jinja2_environment = Environment(loader=BaseLoader())
 
 container = ApplicationContainer()
 app = FastAPI(title="Personal Stock & Fund Research Platform")
@@ -214,24 +217,21 @@ async def confirm_rejected_snapshot(
 @app.get("/", response_class=HTMLResponse)
 async def research_page() -> str:
     """Return the local-only research shell with required labels."""
-    return f"""<!doctype html>
+    template = jinja2_environment.from_string(
+        """<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Personal Stock & Fund Research Platform</title>
-  </head>
   <body>
-    <main>
-      <h1>Local Research Platform</h1>
-      <p><strong>Adjustment mode:</strong> UNADJUSTED</p>
-      <p><strong>Data quality:</strong> DATA_QUALITY_NOT_ASSESSED</p>
-      <p><strong>Provider:</strong> UNCONFIGURED</p>
-      <p><strong>Status:</strong> {container.status().latest_ingestion}</p>
-      <p><strong>Research estimate disclaimer:</strong> Research estimate, not investment advice.</p>
-    </main>
+    <h1>Local Research Platform</h1>
+    <p>Adjustment mode: {{ adjustment_mode }}</p>
+    <p>Data quality: {{ quality }}</p>
+    <p>Research estimate, not investment advice.</p>
   </body>
 </html>"""
+    )
+    return template.render(
+        adjustment_mode="UNADJUSTED",
+        quality="DATA_QUALITY_NOT_ASSESSED",
+    )
 
 
 @app.get("/api/v1/status")
