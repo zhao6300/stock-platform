@@ -26,23 +26,23 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 2.1, 4.2, 5.9, 7.9, 10.10-10.13_
 
 - [ ] 2. Implement local ownership and strict MVP capability boundaries
-  - [ ] 2.1 Implement local owner, loopback, session, CSRF, idempotency, and writer-lock guards
+  - [x] 2.1 Implement local owner, loopback, session, CSRF, idempotency, and writer-lock guards
     - **Affected modules:** `src/stock_platform/application/access.py`, `src/stock_platform/infrastructure/locking.py`, `tests/unit/application/test_access.py`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Guards reject a different effective UID before transaction/network access and serialize writes without preventing same-user read sessions; run `python -m pytest tests/unit/application/test_access.py -q`.
     - _Requirements: 1.1-1.2_
-  - [ ] 2.2 Write Property 1 test for local owner isolation
+  - [x] 2.2 Write Property 1 test for local owner isolation
     - **Affected modules:** `tests/property/test_property_01_local_owner_isolation.py`.
     - **Prerequisites:** 2.1, 1.2.
     - **Expected output / verify:** Hypothesis test hashes persisted state before/after allowed and denied UID attempts; run `python -m pytest tests/property/test_property_01_local_owner_isolation.py -q`.
     - **Property 1: Local owner isolation.**
     - **Validates: Requirements 1.1, 1.2**
-  - [ ] 2.3 Implement future-capability and market-interaction policy rejection
+  - [x] 2.3 Implement future-capability and market-interaction policy rejection
     - **Affected modules:** `src/stock_platform/domain/capabilities.py`, `src/stock_platform/application/policy.py`, `tests/unit/application/test_mvp_policy.py`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Typed rejection enumerates every requested unsupported capability and exposes no broker/order/live-trading port; run `python -m pytest tests/unit/application/test_mvp_policy.py -q`.
     - _Requirements: 1.6, 1.8, 12.16_
-  - [ ] 2.4 Write Property 3 test for inert unsupported MVP capabilities
+  - [x] 2.4 Write Property 3 test for inert unsupported MVP capabilities
     - **Affected modules:** `tests/property/test_property_03_unsupported_capabilities.py`.
     - **Prerequisites:** 2.3, 1.2.
     - **Expected output / verify:** Generated unsupported-capability subsets cause no network calls or persisted-state changes; run `python -m pytest tests/property/test_property_03_unsupported_capabilities.py -q`.
@@ -50,7 +50,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Validates: Requirements 1.8**
 
 - [ ] 3. Implement pure instrument, identifier, and calendar domains
-  - [ ] 3.1 Implement supported instrument classification and validation
+  - [x] 3.1 Implement supported instrument classification and validation
     - **Affected modules:** `src/stock_platform/domain/instruments.py`, `tests/unit/domain/test_instruments.py`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Closed four-value instrument type and market-aware instrument values reject aliases/other types; run `python -m pytest tests/unit/domain/test_instruments.py -q`.
