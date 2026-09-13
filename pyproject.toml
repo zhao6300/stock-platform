@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "stock-platform"
+version = "0.1.0"
+description = "A local, single-user stock and fund research platform."
+readme = { file = "docs/design.md", content-type = "text/markdown" }
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "alembic==1.16.5",
+  "anyio==4.11.0",
+  "duckdb==1.4.1",
+  "fastapi==0.121.2",
+  "httpx==0.28.1",
+  "hypothesis==6.148.0",
+  "jinja2==3.1.6",
+  "keyring==25.7.0",
+  "numpy==2.3.5",
+  "pandas==2.3.3",
+  "plotly==6.5.0",
+  "pyarrow==23.0.0",
+  "pydantic==2.12.4",
+  "pytest==9.0.2",
+  "sqlalchemy==2.0.45",
+  "time-machine==2.19.0",
+  "typer==0.21.1",
+  "uvicorn==0.40.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "build==1.3.0",
+  "freezegun==1.5.5",
+  "hypothesis==6.148.0",
+  "mypy==1.19.0",
+  "pytest==9.0.2",
+  "pytest-asyncio==1.3.0",
+  "ruff==0.15.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stock_platform"]
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["B", "C4", "E4", "E7", "E9", "F", "I", "PLR", "PLW", "RUF", "SIM", "T20", "UP"]
+[tool.ruff.lint.per-file-ignores]
+"src/stock_platform/domain/common.py" = ["PLR0911", "PLR0912"]
+"src/stock_platform/application/ingestion.py" = ["PLR0912", "PLR0915"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["stock_platform"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+packages = ["stock_platform"]
+mypy_path = "src"
+explicit_package_bases = true
+
+[tool.coverage.run]
+branch = true
+source = ["stock_platform"]
