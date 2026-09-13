@@ -28,7 +28,7 @@ def test_drawdown_follows_the_running_maximum(values: list[Decimal | None]) -> N
     assume(any(value is not None for value in values))
     assume(values[-1] is None or values[-1] != Decimal(0))
     points = [
-        SeriesPoint(date(2025, 1, (index % 31) + 1), value)
+        SeriesPoint(date(2025, (index // 31) + 1, (index % 31) + 1), value)
         for index, value in enumerate(values)
     ]
     result = drawdown(points)
