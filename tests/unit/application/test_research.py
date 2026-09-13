@@ -6,7 +6,77 @@ from uuid import UUID
 
 from stock_platform.application.research import ResearchRequest
 from stock_platform.application.research_runner import ResearchRunner
+from stock_platform.domain.common import Success
 from stock_platform.domain.research import DataSnapshotManifest, ResearchDateRange, ResearchManifest
+
+
+def _manifest() -> ResearchManifest:
+    return ResearchManifest(
+        run_id=UUID("00000000-0000-7000-8000-000000000000"),
+        snapshot_id="snapshot-1",
+        security_scope=("security-1",),
+        date_range=ResearchDateRange(start=date(2025, 1, 1), end=date(2025, 1, 2)),
+        providers=("provider-1",),
+        calendar_versions=("calendar-1",),
+        adjustment_mode="UNADJUSTED",
+        quality_rule_version="quality-1",
+        research_logic_version="logic-1",
+        parameters=(("window", "10"),),
+        dependency_environment_id="environment-1",
+        generated_at=datetime(2025, 1, 2, tzinfo=UTC),
+        benchmark="benchmark-1",
+        cost_model="NONE",
+        missing_price_policy="UNAVAILABLE",
+        tradability_coverage="DAILY",
+        deterministic_seed=0,
+    )
+
+
+def _snapshot() -> DataSnapshotManifest:
+    return DataSnapshotManifest(
+        dataset_version_id="dataset-1",
+        objects=(),
+        security_master_versions=("master-1",),
+        mapping_versions=("mapping-1",),
+        calendar_versions=("calendar-1",),
+        factor_series_versions=("factor-1",),
+        quality_rule_set_version="quality-1",
+        quality_assessment_cutoff=datetime(2025, 1, 1, tzinfo=UTC),
+    )
+
+
+def _repositories() -> MappingProxyType:
+    return MappingProxyType(
+        {
+            "calendar": ("calendar-1",),
+            "adjustment_mode": ("UNADJUSTED",),
+            "quality_rule": ("quality-1",),
+            "research_logic": ("logic-1",),
+            "dependency_environment": ("environment-1",),
+        }
+    )
+
+
+class _ResearchRunResult:
+    def run(self, manifest: ResearchManifest) -> Success:
+        """Return a success result for the given manifest."""
+        return Success(
+            {
+                "result": "CREATED",
+                "manifest": manifest,
+            }
+        )
+
+
+def test_apply_replay_uses_snapshot_snapshot_and_publishes_manifest() -> None:
+    runner = ResearchRunner(_repositories())
+    manifest = _manifest()
+    snapshot = _snapshot()
+    result = runner.apply_replay(_ResearchRunResult(), manifest, snapshot)
+
+    assert result is not None
+    assert result.value["manifest"] == manifest
+    assert result.value["result"] == "CREATED"
 
 
 def test_research_id_is_canonical() -> None:

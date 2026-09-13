@@ -56,6 +56,22 @@ class ResearchRunner:
             return Failure(ReplayOutcome(None, missing))
         return Success(ReplayOutcome("READY", ()))
 
+    def apply_replay(
+        self,
+        runner: ResearchManifestRepository,
+        manifest: ResearchManifest,
+        snapshot: DataSnapshotManifest | None,
+    ) -> Result[ResearchRunOutcome, ReplayOutcome]:
+        """Run the replay runner using the pinned artifacts; fail atomically."""
+        preparation = self.prepare(manifest, snapshot)
+        if not isinstance(preparation, Success):
+            return Failure(preparation.error)
+
+        result = runner.run(manifest)
+        if not isinstance(result, Success):
+            return Failure(ReplayOutcome(None, ()))
+        return result
+
     def run(
         self,
         runner: ResearchManifestRepository,
