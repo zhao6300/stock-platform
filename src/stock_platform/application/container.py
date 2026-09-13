@@ -22,6 +22,7 @@ class ContainerStatus:
     compatible_schemas: tuple[str, ...]
     storage: str | None
     latest_ingestion: str
+    platform: str
 
 
 @dataclass(slots=True)
