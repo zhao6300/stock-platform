@@ -36,6 +36,8 @@ class ResearchManifestRepository(Protocol):
 
     def get(self, manifest_id: str) -> ResearchManifest | None: ...
 
+    def run(self, manifest: ResearchManifest) -> Result[ResearchRunOutcome, str]: ...
+
 
 class ResearchRunner:
     """Persist the run boundary before creating any derived research result."""
@@ -60,7 +62,7 @@ class ResearchRunner:
         manifest: ResearchManifest,
     ) -> Result[ResearchRunOutcome, str]:
         """Commit the manifest, then publish exactly one derived result."""
-        saved = runner.save(manifest)
-        if not isinstance(saved, Success):
-            return Failure(saved.error)
-        return Success(ResearchRunOutcome(manifest, "CREATED"))
+        result = runner.run(manifest)
+        if not isinstance(result, Success):
+            return Failure(result.error)
+        return result
