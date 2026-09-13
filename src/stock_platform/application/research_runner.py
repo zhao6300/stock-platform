@@ -82,9 +82,17 @@ class ResearchRunner:
         self,
         runner: ResearchManifestRepository,
         manifest: ResearchManifest,
-    ) -> Result[ResearchRunOutcome, str]:
+    ) -> Result[ResearchRunOutcome, ReplayOutcome]:
         """Commit the manifest, then publish exactly one derived result."""
+        saved = runner.save(manifest)
+        if not isinstance(saved, Success):
+            return Failure(
+                ReplayOutcome(None, (MissingReplayArtifact("manifest", saved.error),))
+            )
+
         result = runner.run(manifest)
         if not isinstance(result, Success):
-            return Failure(result.error)
+            return Failure(
+                ReplayOutcome(None, (MissingReplayArtifact("result", result.error),))
+            )
         return result
