@@ -126,40 +126,40 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Validates: Requirements 6.6-6.9, 9.12**
 
 - [ ] 4. Implement compliance and export policy
-  - [ ] 4.1 Implement Compliance Profile validation, versioning, and decisions
+  - [x] 4.1 Implement Compliance Profile validation, versioning, and decisions
     - **Affected modules:** `src/stock_platform/domain/compliance.py`, `tests/unit/domain/test_compliance.py`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Exact enums/lengths/purpose uniqueness/second precision/UTC offsets, append-only changes, first-request gate, and retention decisions; run focused unit tests.
     - _Requirements: 4.1-4.4, 4.8-4.9_
-  - [ ] 4.2 Write Property 14 test for conjunctive Compliance Profile validity
+  - [x] 4.2 Write Property 14 test for conjunctive Compliance Profile validity
     - **Affected modules:** `tests/property/test_property_14_compliance_validation.py`.
     - **Prerequisites:** 4.1, 1.2.
     - **Expected output / verify:** Generated profiles identify exactly all invalid fields and issue no request/version on failure; run the file with pytest.
     - **Property 14: Compliance validity is conjunctive and reports all violations.**
     - **Validates: Requirements 4.2, 4.8**
-  - [ ] 4.3 Write Property 15 test for append-only compliance history
+  - [x] 4.3 Write Property 15 test for append-only compliance history
     - **Affected modules:** `tests/property/test_property_15_compliance_history.py`.
     - **Prerequisites:** 4.1, 1.2.
     - **Expected output / verify:** Rule-based state machine proves immutable prior versions and rejected update/delete; run the file with pytest.
     - **Property 15: Compliance history is append-only.**
     - **Validates: Requirements 4.3, 4.9**
-  - [ ] 4.4 Implement pinned-profile export authorization
+  - [x] 4.4 Implement pinned-profile export authorization
     - **Affected modules:** `src/stock_platform/application/exports.py`, `tests/unit/application/test_exports.py`.
     - **Prerequisites:** 4.1.
     - **Expected output / verify:** Explicit export categories are allowed/denied by a referenced profile version before output creation; run focused tests.
     - _Requirements: 4.5, 4.7_
-  - [ ] 4.5 Write Property 16 test for pinned-profile export authorization
+  - [x] 4.5 Write Property 16 test for pinned-profile export authorization
     - **Affected modules:** `tests/property/test_property_16_export_authorization.py`.
     - **Prerequisites:** 4.4, 1.2.
     - **Expected output / verify:** Generated category/permission combinations prove denied exports emit zero bytes and preserve state; run the file with pytest.
     - **Property 16: Export authorization follows the pinned profile version.**
     - **Validates: Requirements 4.5**
-  - [ ] 4.6 Implement retained-raw-response compliance provenance values
+  - [x] 4.6 Implement retained-raw-response compliance provenance values
     - **Affected modules:** `src/stock_platform/domain/compliance.py`, `src/stock_platform/domain/provenance.py`, `tests/unit/domain/test_raw_provenance.py`.
     - **Prerequisites:** 4.1.
     - **Expected output / verify:** Raw retention record requires provider, parameters, profile version, and legal second-precision request time; run focused tests.
     - _Requirements: 4.6_
-  - [ ] 4.7 Write Property 17 test for complete raw-data compliance provenance
+  - [x] 4.7 Write Property 17 test for complete raw-data compliance provenance
     - **Affected modules:** `tests/property/test_property_17_raw_provenance.py`.
     - **Prerequisites:** 4.6, 1.2.
     - **Expected output / verify:** Arbitrary retained responses cannot be constructed without complete provenance; run the file with pytest.
