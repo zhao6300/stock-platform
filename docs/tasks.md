@@ -297,12 +297,12 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated NAV rows/calendars prove iff acceptance and cumulative NAV rules; run the file with pytest.
     - **Property 6: Fund NAV acceptance is equivalent to all canonical constraints.**
     - **Validates: Requirements 2.3, 2.4, 2.6, 7.7, 9.5, 9.7**
-  - [ ] 7.4 Implement unsupported-coverage decision at ingestion boundary
+  - [x] 7.4 Implement unsupported-coverage decision at ingestion boundary
     - **Affected modules:** `src/stock_platform/application/ingestion.py`, `tests/unit/application/test_ingestion_coverage.py`.
     - **Prerequisites:** 6.3, 3.1.
     - **Expected output / verify:** Missing market/type support returns exact pair without selecting/publishing a new dataset; run focused tests.
     - _Requirements: 2.5_
-  - [ ] 7.5 Write Property 7 test for non-mutating unsupported coverage
+  - [x] 7.5 Write Property 7 test for non-mutating unsupported coverage
     - **Affected modules:** `tests/property/test_property_07_unsupported_coverage.py`.
     - **Prerequisites:** 7.4, 1.2.
     - **Expected output / verify:** Generated capabilities and requests preserve dataset hash on unsupported pairs; run the file with pytest.

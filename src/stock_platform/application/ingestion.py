@@ -24,6 +24,41 @@ from stock_platform.domain.quality import (
 
 type Observation = Any
 
+type MarketInstrumentPair = tuple[str, str]
+
+
+@dataclass(frozen=True, slots=True)
+class UnsupportedCoverageResult:
+    market: str
+    instrument_type: str
+
+
+@dataclass(frozen=True, slots=True)
+class SupportedCoverage:
+    market: str
+    instrument_type: str
+
+
+def unsupported_coverage(
+    market: str,
+    instrument_type: str,
+    coverage: Sequence[MarketInstrumentPair],
+) -> Result[SupportedCoverage, UnsupportedCoverageResult]:
+    """Reject a market/type pair before opening either storage or network."""
+    if (market, instrument_type) in coverage:
+        return Success(
+            SupportedCoverage(
+                market=market,
+                instrument_type=instrument_type,
+            )
+        )
+    return Failure(
+        UnsupportedCoverageResult(
+            market=market,
+            instrument_type=instrument_type,
+        )
+    )
+
 
 def decide_observation_version(
     current: ObservationVersion | None,
@@ -138,12 +173,13 @@ class IngestionPorts(Protocol):
 
     def current_version(self, observation: Observation) -> ObservationVersion | None: ...
 
-    def candidate_version(
-        self, observation: Observation
-    ) -> ObservationVersion: ...
+    def candidate_version(self, observation: Observation) -> ObservationVersion: ...
 
     def publish(
-        self, current: ObservationVersion | None, candidate: ObservationVersion, report: QualityReport
+        self,
+        current: ObservationVersion | None,
+        candidate: ObservationVersion,
+        report: QualityReport,
     ) -> Result[Observation, PublicationFailure]: ...
 
 
@@ -215,7 +251,7 @@ async def run_ingestion(
                 plan=plan,
                 status=IngestionStatus.COMPLETED,
                 counts=None,
-            finalized_dates=frozenset(operation.finalized_before),
+                finalized_dates=frozenset(operation.finalized_before),
                 resumable_boundary=None,
                 quality_reports=(),
                 version_decisions=(),
@@ -274,9 +310,7 @@ async def run_ingestion(
 
         if not quality_report.issues:
             outcome = ObservationRunOutcome(True, False, False, False)
-        elif any(
-            issue.rule.status is QualityStatus.REJECTED for issue in quality_report.issues
-        ):
+        elif any(issue.rule.status is QualityStatus.REJECTED for issue in quality_report.issues):
             outcome = ObservationRunOutcome(False, False, True, False)
         else:
             outcome = ObservationRunOutcome(False, True, False, False)
@@ -297,9 +331,7 @@ async def run_ingestion(
 
     counts_result = observation_run_counts(len(plan.requested_dates), outcomes)
     if isinstance(counts_result, Failure):
-        return Failure(
-            IngestionRunFailure(finalized_dates=frozenset(finalized_dates))
-        )
+        return Failure(IngestionRunFailure(finalized_dates=frozenset(finalized_dates)))
     counts = counts_result.value
 
     rejected_count = sum(outcome.rejected for outcome in outcomes)
