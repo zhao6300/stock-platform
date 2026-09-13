@@ -12,7 +12,4 @@ class DTO:
     def as_dict(self) -> JsonObject:
         if not is_dataclass(self):
             raise TypeError("DTO subclasses must be dataclasses")
-        return {
-            field.name: canonical_value(getattr(self, field.name))
-            for field in fields(self)
-        }
+        return {field.name: canonical_value(getattr(self, field.name)) for field in fields(self)}

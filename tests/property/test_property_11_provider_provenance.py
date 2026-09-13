@@ -27,7 +27,7 @@ def test_provider_provenance_survives_normalization(
         provider_identifiers=(provider_identifier,),
         source_version=source_version,
         correlation_id=correlation_id,
-    retrieved_at=datetime(2026, 1, 1, 12, 0, tzinfo=UTC),
+        retrieved_at=datetime(2026, 1, 1, 12, 0, tzinfo=UTC),
         payload=payload,
     )
 

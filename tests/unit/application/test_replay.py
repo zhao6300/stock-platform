@@ -74,7 +74,9 @@ class _Runner:
 
 def test_replays_exact_manifest_when_all_artifacts_are_pinned() -> None:
     runner = _Runner({"result": "CREATED"})
-    result = replay_pinned_research(_manifest(), {"result": "CREATED"}, runner, _repositories(), _snapshot())
+    result = replay_pinned_research(
+        _manifest(), {"result": "CREATED"}, runner, _repositories(), _snapshot()
+    )
 
     assert isinstance(result, Success)
     assert result.value.differences == ()

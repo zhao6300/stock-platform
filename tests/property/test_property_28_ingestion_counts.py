@@ -32,4 +32,6 @@ def test_ingestion_counts_are_exclusive_and_conserved(
     )
     assert isinstance(result, Success)
     counts = result.value
-    assert counts.accepted + counts.warning + counts.rejected + counts.unresolved == counts.requested
+    assert (
+        counts.accepted + counts.warning + counts.rejected + counts.unresolved == counts.requested
+    )

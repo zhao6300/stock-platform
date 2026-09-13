@@ -35,24 +35,12 @@ def daily_bar_issues(candidate: DailyBarCandidate) -> frozenset[str]:
     candidate=st.builds(
         DailyBarCandidate,
         observation_date=st.just(date(2026, 1, 2)),
-        open=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")
-        ),
-        high=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")
-        ),
-        low=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")
-        ),
-        close=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")
-        ),
-        volume=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0")
-        ),
-        turnover=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0")
-        ),
+        open=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")),
+        high=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")),
+        low=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")),
+        close=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")),
+        volume=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0")),
+        turnover=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0")),
         currency=st.just("CNY"),
     ),
 )

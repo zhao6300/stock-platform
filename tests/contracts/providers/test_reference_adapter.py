@@ -20,7 +20,9 @@ def test_reference_adapter_implements_contract_and_capabilities() -> None:
 
 def test_reference_adapter_preserves_provenance_and_normalization() -> None:
     adapter = ReferenceProviderAdapter()
-    envelope = next(iter(adapter.fetch(ProviderRequest(provider="reference", category="daily_bar"))))
+    envelope = next(
+        iter(adapter.fetch(ProviderRequest(provider="reference", category="daily_bar")))
+    )
 
     assert envelope.provider == "reference"
     assert envelope.provider_identifiers == ("reference-id",)

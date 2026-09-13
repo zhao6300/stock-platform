@@ -103,7 +103,9 @@ async def test_resume_requests_the_unfinalized_complement() -> None:
 
     assert ports.fetched == [date(2026, 1, 1), date(2026, 1, 3)]
     assert isinstance(result, Success)
-    assert result.value.finalized_dates == frozenset((date(2026, 1, 1), date(2026, 1, 2), date(2026, 1, 3)))
+    assert result.value.finalized_dates == frozenset(
+        (date(2026, 1, 1), date(2026, 1, 2), date(2026, 1, 3))
+    )
 
 
 def test_compliance_gate_blocks_ingestion_before_any_network_call() -> None:

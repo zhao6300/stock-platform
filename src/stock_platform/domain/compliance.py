@@ -75,9 +75,7 @@ _EXPORT_PERMISSIONS = frozenset(
         "RAW_PROVIDER_DATA",
     ),
 )
-_ACCOUNT_TYPES = frozenset(
-    {item.value for item in AccountType}
-)
+_ACCOUNT_TYPES = frozenset({item.value for item in AccountType})
 
 
 @dataclass(frozen=True, slots=True)
@@ -155,9 +153,7 @@ class ComplianceValidator:
                     fields=invalid_fields,
                 )
             )
-        return Success(
-            ComplianceProfile(profile_id=profile.profile_id, version=profile)
-        )
+        return Success(ComplianceProfile(profile_id=profile.profile_id, version=profile))
 
 
 def _invalid_profile_fields(profile: ComplianceProfileVersion) -> frozenset[str]:

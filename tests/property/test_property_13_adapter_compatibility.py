@@ -13,9 +13,7 @@ supported_contract_versions = st.from_regex(r"\w+", fullmatch=True)
     existing=supported_contract_versions,
     requested=supported_contract_versions,
 )
-def test_incompatible_adapters_stay_disabled(
-    existing: str, requested: str
-) -> None:
+def test_incompatible_adapters_stay_disabled(existing: str, requested: str) -> None:
     registry = ProviderRegistry(
         adapters=("contracted",),
         allow_list=("contracted",),

@@ -26,9 +26,7 @@ def test_keychain_store_uses_provider_scoped_service_and_reference() -> None:
     reference = store.set("alpha", "token:one", "secret-value")
 
     assert reference == "token:one"
-    assert adapter.secrets == {
-        "stock-research/alpha/token:one": "secret-value"
-    }
+    assert adapter.secrets == {"stock-research/alpha/token:one": "secret-value"}
     assert store.get("alpha", "token:one") == "secret-value"
     store.delete("alpha", "token:one")
     assert adapter.secrets == {}

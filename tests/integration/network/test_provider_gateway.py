@@ -12,9 +12,7 @@ from stock_platform.infrastructure.network.gateway import (
 
 
 class FakeResolver:
-    def __call__(
-        self, host: str, service: int | None = None, family: int = 0, type: int = 0
-    ):
+    def __call__(self, host: str, service: int | None = None, family: int = 0, type: int = 0):
         if host != "approved.example.test":
             raise OSError("resolution blocked in local tests")
         return [(2, 1, 6, "", ("93.184.216.34", service or 443))]
@@ -27,7 +25,9 @@ class RedirectTransport:
     async def handle_request(self, request: httpx.Request) -> httpx.Response:
         self.urls = (*self.urls, str(request.url))
         if self.urls == ("https://approved.example.test/api/start",):
-            return httpx.Response(302, headers={"location": "https://approved.example.test/api/finish"})
+            return httpx.Response(
+                302, headers={"location": "https://approved.example.test/api/finish"}
+            )
         return httpx.Response(200, content=b"finished")
 
 

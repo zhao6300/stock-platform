@@ -16,7 +16,10 @@ def test_observation_gap_reason_is_exhaustive_for_each_context() -> None:
         dates=(observation_date,),
     )
 
-    assert observation_gap_reason(security_id, observation_date, observation) == ObservationGapReason.MISSING_OR_UNKNOWN_TRADABILITY
+    assert (
+        observation_gap_reason(security_id, observation_date, observation)
+        == ObservationGapReason.MISSING_OR_UNKNOWN_TRADABILITY
+    )
 
 
 def test_observation_gap_reason_classifies_a_missing_security_master() -> None:
@@ -29,4 +32,7 @@ def test_observation_gap_reason_classifies_a_missing_security_master() -> None:
         dates=(observation_date,),
     )
 
-    assert observation_gap_reason("", observation_date, observation) == ObservationGapReason.MISSING_SECURITY_MASTER
+    assert (
+        observation_gap_reason("", observation_date, observation)
+        == ObservationGapReason.MISSING_SECURITY_MASTER
+    )

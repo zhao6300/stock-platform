@@ -26,7 +26,9 @@ class Sell:
 def blocked_case(status: str) -> TradeRecord:
     trading_date = date(2026, 1, 2)
     execution_date = date(2026, 1, 5)
-    calendar = TradingCalendarVersion("calendar-v1", "XSHG", frozenset([trading_date, execution_date]))
+    calendar = TradingCalendarVersion(
+        "calendar-v1", "XSHG", frozenset([trading_date, execution_date])
+    )
     engine = BacktestEngine(
         strategy=Sell(),
         calendar=calendar,

@@ -29,7 +29,7 @@ def _profile() -> ComplianceProfileVersion:
         retention_permission="PROHIBITED",
         export_permission="DERIVED_RESULTS_ONLY",
         confirmation_time=datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC),
-)
+    )
 
 
 def test_compliance_validation_is_conjunctive_and_reports_all_violations() -> None:

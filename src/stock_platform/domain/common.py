@@ -10,9 +10,7 @@ from math import isfinite
 from stock_platform.domain.fundamentals import SeriesPoint as SeriesPoint
 
 type JsonObject = dict[str, JsonValue]
-type JsonValue = (
-    None | bool | int | float | str | JsonObject | JsonArray
-)
+type JsonValue = None | bool | int | float | str | JsonObject | JsonArray
 type JsonArray = list[JsonValue]
 
 

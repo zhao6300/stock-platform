@@ -53,9 +53,7 @@ class LocalAccessGuard:
         if write:
             if not context.csrf_token:
                 return Failure(
-                    ErrorEnvelope.build(
-                        ErrorCode.VALIDATION_FAILED, "A CSRF token is required."
-                    )
+                    ErrorEnvelope.build(ErrorCode.VALIDATION_FAILED, "A CSRF token is required.")
                 )
             if not context.idempotency_key:
                 return Failure(
@@ -71,9 +69,7 @@ class LocalAccessGuard:
         )
 
 
-def require_local_access(
-    context: AccessContext, *, write: bool = False
-) -> AllowedAccess:
+def require_local_access(context: AccessContext, *, write: bool = False) -> AllowedAccess:
     """Validate access and raise prior to transactions or provider network calls."""
 
     result = LocalAccessGuard().check(context, write=write)

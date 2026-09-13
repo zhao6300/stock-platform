@@ -10,13 +10,9 @@ type ProbeOutcome = Literal["success", "failure"]
 class CapabilityReporter(Protocol):
     """Capability values assembled from provider responses."""
 
-    def capability(
-        self, name: str, value: Any
-    ) -> CapabilityValue: ...
+    def capability(self, name: str, value: Any) -> CapabilityValue: ...
 
-    def unreported(
-        self, name: str
-    ) -> CapabilityValue: ...
+    def unreported(self, name: str) -> CapabilityValue: ...
 
 
 @dataclass(frozen=True, slots=True)

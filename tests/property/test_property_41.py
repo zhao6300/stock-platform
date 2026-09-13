@@ -21,7 +21,9 @@ def _points(
     start: int | None = None,
 ) -> list[SeriesPoint]:
     base = start or 2025
-    days = sorted({date(base, 1, 1) + timedelta(days=lidex) for lidex, _ in enumerate(values)})[: len(values)]
+    days = sorted({date(base, 1, 1) + timedelta(days=lidex) for lidex, _ in enumerate(values)})[
+        : len(values)
+    ]
     return [SeriesPoint(value_date, value) for value_date, value in zip(days, values, strict=False)]
 
 
@@ -35,7 +37,9 @@ def _points(
         max_size=34,
     )
 )
-def test_periodic_returns_follow_consecutive_non_missing_values(values: list[Decimal | None]) -> None:
+def test_periodic_returns_follow_consecutive_non_missing_values(
+    values: list[Decimal | None],
+) -> None:
     series = _points(values)
     present = [point for point in series if point.value is not None]
     expected = (

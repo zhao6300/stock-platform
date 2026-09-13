@@ -24,7 +24,9 @@ class Buy:
 
 def test_fills_reconcile_to_cost_data() -> None:
     trading_date = date(2026, 1, 2)
-    calendar = TradingCalendarVersion("calendar-v1", "XSHG", frozenset([trading_date, date(2026, 1, 5)]))
+    calendar = TradingCalendarVersion(
+        "calendar-v1", "XSHG", frozenset([trading_date, date(2026, 1, 5)])
+    )
     cost_model = CostModel(
         commission_rate=Decimal("0.01"),
         tax_rate=Decimal("0.02"),
@@ -35,8 +37,14 @@ def test_fills_reconcile_to_cost_data() -> None:
     engine = BacktestEngine(
         strategy=Buy(),
         calendar=calendar,
-        bars=[DailyBar("A", trading_date, Decimal(100)), DailyBar("A", date(2026, 1, 5), Decimal(100))],
-        tradability=[Tradability("A", trading_date, "OPEN"), Tradability("A", date(2026, 1, 5), "OPEN")],
+        bars=[
+            DailyBar("A", trading_date, Decimal(100)),
+            DailyBar("A", date(2026, 1, 5), Decimal(100)),
+        ],
+        tradability=[
+            Tradability("A", trading_date, "OPEN"),
+            Tradability("A", date(2026, 1, 5), "OPEN"),
+        ],
         cost_model=cost_model,
         missing_price_policy="FIVE_SESSION_FALLBACK",
         initial_cash=Decimal(1000),

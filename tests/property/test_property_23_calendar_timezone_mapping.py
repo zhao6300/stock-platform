@@ -36,8 +36,7 @@ def _version(
         min_value=datetime(1990, 1, 1),
         max_value=datetime(2999, 12, 31),
         allow_imaginary=False,
-    )
-    .map(lambda value: value.replace(tzinfo=UTC))
+    ).map(lambda value: value.replace(tzinfo=UTC))
 )
 def test_unique_timezones_convert_timestamps_to_the_same_local_date(
     timestamp: datetime,

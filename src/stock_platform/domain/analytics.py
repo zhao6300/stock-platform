@@ -70,13 +70,9 @@ class UndefinedCorrelation:
 
 type PeriodicReturnResult = Result[tuple[ReturnPoint, ...], InsufficientData]
 type VolatilityResult = Result[tuple[Decimal, Decimal], InsufficientData]
-type DrawdownResult = Result[
-    tuple[tuple[MissingNumeric, ...], Decimal], InsufficientData
-]
+type DrawdownResult = Result[tuple[tuple[MissingNumeric, ...], Decimal], InsufficientData]
 type MovingAverageResult = Result[tuple[MissingNumeric, ...], InvalidWindow]
-type CorrelationResult = Result[
-    Decimal, InsufficientData | UndefinedCorrelation
-]
+type CorrelationResult = Result[Decimal, InsufficientData | UndefinedCorrelation]
 
 _MISSING_REPORT = "__missing__"
 
@@ -95,11 +91,7 @@ def returns(values: Sequence[SeriesPoint]) -> PeriodicReturnResult:
     ordered = _ordered_points(values)
     numeric = [point.value for point in ordered if point.value is not None]
     if len(numeric) < _MINIMUM_RETURN_LENGTH:
-        return Failure(
-            InsufficientData(
-                required=_MINIMUM_RETURN_LENGTH, available=len(numeric)
-            )
-        )
+        return Failure(InsufficientData(required=_MINIMUM_RETURN_LENGTH, available=len(numeric)))
     prior = ordered[0]
     result: list[ReturnPoint] = []
     for point in ordered[1:]:
@@ -108,9 +100,7 @@ def returns(values: Sequence[SeriesPoint]) -> PeriodicReturnResult:
         if prior.value is None:
             prior = point
             continue
-        result.append(
-            ReturnPoint(date=point.date, value=point.value / prior.value - 1)
-        )
+        result.append(ReturnPoint(date=point.date, value=point.value / prior.value - 1))
         prior = point
     return Success(tuple(result))
 
@@ -118,19 +108,11 @@ def returns(values: Sequence[SeriesPoint]) -> PeriodicReturnResult:
 def volatility(values: Sequence[SeriesPoint]) -> VolatilityResult:
     """Return annualized sample volatility and the annualization factor."""
     ordered = _ordered_points(values)
-    numeric = tuple(
-        Decimal(point.value) for point in ordered if point.value is not None
-    )
+    numeric = tuple(Decimal(point.value) for point in ordered if point.value is not None)
     if len(numeric) < _MINIMUM_RETURN_LENGTH:
-        return Failure(
-            InsufficientData(
-                required=_MINIMUM_RETURN_LENGTH, available=len(numeric)
-            )
-        )
+        return Failure(InsufficientData(required=_MINIMUM_RETURN_LENGTH, available=len(numeric)))
     mean = _mean(numeric)
-    variance = Decimal(
-        sum((value - mean) ** 2 for value in numeric) / (len(numeric) - 1)
-    )
+    variance = Decimal(sum((value - mean) ** 2 for value in numeric) / (len(numeric) - 1))
     standard_deviation = variance.sqrt(getcontext())
     return Success(
         (
@@ -144,16 +126,10 @@ def drawdown(values: Sequence[SeriesPoint]) -> DrawdownResult:
     """Return aligned drawdowns and maximum drawdown for positive observations."""
     ordered = _ordered_points(values)
     positive = tuple(
-        point.value
-        for point in ordered
-        if point.value is not None and point.value > 0
+        point.value for point in ordered if point.value is not None and point.value > 0
     )
     if len(positive) < _MINIMUM_DRAWDOWN_LENGTH:
-        return Failure(
-            InsufficientData(
-                required=_MINIMUM_DRAWDOWN_LENGTH, available=len(positive)
-            )
-        )
+        return Failure(InsufficientData(required=_MINIMUM_DRAWDOWN_LENGTH, available=len(positive)))
     pointwise: list[MissingNumeric] = []
     running_maximum = Decimal(0)
     maximum = Decimal(0)
@@ -173,9 +149,7 @@ def drawdown(values: Sequence[SeriesPoint]) -> DrawdownResult:
     return Success((tuple(pointwise), maximum))
 
 
-def moving_average(
-    values: Sequence[SeriesPoint], window: int
-) -> MovingAverageResult:
+def moving_average(values: Sequence[SeriesPoint], window: int) -> MovingAverageResult:
     """Return aligned moving averages over non-missing observations."""
     if not _MINIMUM_MOVING_AVERAGE_WINDOW <= window <= _MAXIMUM_MOVING_AVERAGE_WINDOW:
         return Failure(
@@ -203,9 +177,7 @@ def _window_mean(values: Sequence[Decimal], window: int) -> Decimal:
     return sum(values[-window:], Decimal(0)) / window
 
 
-def correlation(
-    left: Sequence[SeriesPoint], right: Sequence[SeriesPoint]
-) -> CorrelationResult:
+def correlation(left: Sequence[SeriesPoint], right: Sequence[SeriesPoint]) -> CorrelationResult:
     """Return Pearson correlation over aligned non-missing dates only."""
     ordered_left = _ordered_points(left)
     ordered_right = _ordered_points(right)
@@ -213,36 +185,25 @@ def correlation(
     aligned = tuple(
         (left_point.value, right_by_date[left_point.date])
         for left_point in ordered_left
-        if left_point.value is not None
-        and right_by_date.get(left_point.date) is not None
+        if left_point.value is not None and right_by_date.get(left_point.date) is not None
     )
     if len(aligned) < _MINIMUM_CORRELATION_LENGTH:
         return Failure(
-            InsufficientData(
-                required=_MINIMUM_CORRELATION_LENGTH, available=len(aligned)
-            )
+            InsufficientData(required=_MINIMUM_CORRELATION_LENGTH, available=len(aligned))
         )
     left_values: list[Decimal] = [pair[0] for pair in aligned if pair[0] is not None]
     right_values: list[Decimal] = [pair[1] for pair in aligned if pair[1] is not None]
     left_mean = _mean(left_values)
     right_mean = _mean(right_values)
-    left_variance = sum(
-        ((value - left_mean) ** 2 for value in left_values), Decimal(0)
-    )
-    right_variance = sum(
-        ((value - right_mean) ** 2 for value in right_values), Decimal(0)
-    )
+    left_variance = sum(((value - left_mean) ** 2 for value in left_values), Decimal(0))
+    right_variance = sum(((value - right_mean) ** 2 for value in right_values), Decimal(0))
     zero_variance: list[ZeroVarianceSide] = []
     if left_variance == 0:
         zero_variance.append("left")
     if right_variance == 0:
         zero_variance.append("right")
     if zero_variance:
-        return Failure(
-            UndefinedCorrelation(
-                zero_variance=tuple(zero_variance)
-            )
-        )
+        return Failure(UndefinedCorrelation(zero_variance=tuple(zero_variance)))
     numerator = sum(
         (left_value - left_mean) * (right_value - right_mean)
         for left_value, right_value in zip(left_values, right_values, strict=True)

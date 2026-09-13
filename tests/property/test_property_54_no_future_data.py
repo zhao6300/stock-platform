@@ -22,6 +22,7 @@ class ProbeStrategy:
         self.seen_dates.append(context.trading_date)
         return ()
 
+
 def test_market_view_and_strategy_context_are_no_future() -> None:
     dates = (date(2026, 1, 2), date(2026, 1, 5))
     calendar = TradingCalendarVersion("calendar-v1", "XSHG", frozenset(dates))

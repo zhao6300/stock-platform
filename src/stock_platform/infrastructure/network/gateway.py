@@ -115,21 +115,13 @@ class CredentialGateway:
             validate_url(self._gateway.endpoints[request.provider], request.url)
         except (KeyError, EndpointPolicyError) as error:
             raise self._blocked(request, str(error)) from error
-        credential = self._credentials.credential(
-            request.provider, request.credential_reference
-        )
+        credential = self._credentials.credential(request.provider, request.credential_reference)
         if credential is None:
-            raise self._gateway._blocked(
-                request, "credential unavailable for provider"
-            )
-        return await self._gateway.request(
-            replace(request, credential=credential)
-        )
+            raise self._gateway._blocked(request, "credential unavailable for provider")
+        return await self._gateway.request(replace(request, credential=credential))
 
     @staticmethod
-    def _blocked(
-        request: NetworkGatewayRequest, reason: str
-    ) -> NetworkGatewayError:
+    def _blocked(request: NetworkGatewayRequest, reason: str) -> NetworkGatewayError:
         return NetworkGatewayError(
             GatewayBlockedTarget(
                 provider=request.provider,
@@ -183,9 +175,7 @@ class NetworkGateway:
         while response.status_code in {301, 302, 303, 307, 308} and redirect_url:
             if not request.follow_redirects:
                 return self._response(response, request, redirect_url=redirect_url)
-            current_url = self._validated_redirect(
-                request, endpoint, redirect_url
-            )
+            current_url = self._validated_redirect(request, endpoint, redirect_url)
             response = await self._authorized_send(
                 request,
                 current_url,
@@ -194,9 +184,7 @@ class NetworkGateway:
             redirect_url = response.headers.get("location")
         return self._response(response, request)
 
-    def _validated_endpoint(
-        self, request: NetworkGatewayRequest
-    ) -> EndpointConfig:
+    def _validated_endpoint(self, request: NetworkGatewayRequest) -> EndpointConfig:
         try:
             endpoint = self.endpoints[request.provider]
             validate_url(endpoint, request.url)
@@ -240,11 +228,7 @@ class NetworkGateway:
 
     @staticmethod
     def _safe_headers(headers: Mapping[str, str]) -> Mapping[str, str]:
-        return {
-            name: value
-            for name, value in headers.items()
-            if name.lower() != "authorization"
-        }
+        return {name: value for name, value in headers.items() if name.lower() != "authorization"}
 
     @staticmethod
     def _canonicalized_url(request: NetworkGatewayRequest) -> str:
@@ -292,9 +276,7 @@ class NetworkGateway:
         )
 
     @staticmethod
-    def _blocked(
-        request: NetworkGatewayRequest, reason: str
-    ) -> NetworkGatewayError:
+    def _blocked(request: NetworkGatewayRequest, reason: str) -> NetworkGatewayError:
         return NetworkGatewayError(
             GatewayBlockedTarget(
                 provider=request.provider,

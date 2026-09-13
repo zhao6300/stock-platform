@@ -25,9 +25,7 @@ def test_unadjusted_prices_are_identical(raw_price: Decimal) -> None:
         source_type=AdjustmentFactorSource.PROVIDER,
         source_id="provider-1",
         retrieved_at=datetime(2025, 12, 1, tzinfo=UTC),
-        points=(
-            AdjustmentFactorPoint(effective_date=date(2025, 1, 1), factor=Decimal(2)),
-        ),
+        points=(AdjustmentFactorPoint(effective_date=date(2025, 1, 1), factor=Decimal(2)),),
     )
     result = AdjustmentService().apply(
         mode=AdjustmentMode.UNADJUSTED,

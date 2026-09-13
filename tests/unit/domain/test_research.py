@@ -56,7 +56,7 @@ def test_missing_replay_artifacts_are_complete() -> None:
         {
             "calendar": {"calendar-1"},
             "adjustment_mode": {"UNADJUSTED"},
-                "quality_rule": {"quality-1"},
+            "quality_rule": {"quality-1"},
             "research_logic": {"logic-1"},
             "dependency_environment": {"environment-1"},
         },

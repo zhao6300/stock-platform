@@ -20,10 +20,7 @@ def fund_nav_issues(candidate: FundNavCandidate) -> tuple[str, ...]:
         issues.append("unit_nav")
     if candidate.cumulative_nav is not None and candidate.cumulative_nav <= 0:
         issues.append("cumulative_nav")
-    if (
-        candidate.cumulative_nav is not None
-        and candidate.cumulative_nav < candidate.unit_nav
-    ):
+    if candidate.cumulative_nav is not None and candidate.cumulative_nav < candidate.unit_nav:
         issues.append("cumulative_nav")
     return tuple(issues)
 
@@ -32,9 +29,7 @@ def fund_nav_issues(candidate: FundNavCandidate) -> tuple[str, ...]:
     candidate=st.builds(
         FundNavCandidate,
         observation_date=st.just(date(2026, 1, 2)),
-        unit_nav=st.decimals(
-            allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")
-        ),
+        unit_nav=st.decimals(allow_nan=False, allow_infinity=False, min_value=Decimal("0.01")),
         cumulative_nav=st.decimals(
             allow_nan=False,
             allow_infinity=False,

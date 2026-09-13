@@ -20,11 +20,10 @@ def _secret_tokens(secret: object) -> frozenset[str]:
 
 
 def _redact_bytes(value: bytes, tokens: frozenset[str]) -> object:
-    replacements = {
-        token.encode("utf-8"): b"[REDACTED]"
-        for token in tokens
-    }
-    for token, replacement in sorted(replacements.items(), key=lambda pair: len(pair[0]), reverse=True):
+    replacements = {token.encode("utf-8"): b"[REDACTED]" for token in tokens}
+    for token, replacement in sorted(
+        replacements.items(), key=lambda pair: len(pair[0]), reverse=True
+    ):
         value = value.replace(token, replacement)
     return value
 
@@ -58,8 +57,7 @@ def _redact(value: object, tokens: frozenset[str]) -> object:
         return _redact_bytes(value, tokens)
     if isinstance(value, Mapping):
         return {
-            _replace_tokens(str(key), tokens): _redact(item, tokens)
-            for key, item in value.items()
+            _replace_tokens(str(key), tokens): _redact(item, tokens) for key, item in value.items()
         }
     if isinstance(value, (list, tuple)):
         return tuple(_redact(item, tokens) for item in value)

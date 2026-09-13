@@ -7,12 +7,13 @@ from urllib.parse import urlsplit
 
 
 class EndpointPolicyError(ValueError):
-   """Raised when a URL is not within the configured provider endpoint."""
+    """Raised when a URL is not within the configured provider endpoint."""
 
 
 def public_address(host: str) -> str:
     """Return host for DNS resolution; no IP literals are allowed."""
     return host
+
 
 @dataclass(frozen=True, slots=True)
 class EndpointConfig:

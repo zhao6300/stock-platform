@@ -36,9 +36,7 @@ def _derive_key(password: bytes, salt: bytes) -> bytes:
     )
 
 
-def create_credential_capsule(
-    payload: bytes, password: bytes
-) -> CredentialCapsule:
+def create_credential_capsule(payload: bytes, password: bytes) -> CredentialCapsule:
     """Encrypt a payload only after deriving a key from password and random salt."""
     if not payload:
         raise ValueError("payload must contain credential bytes")
@@ -57,9 +55,7 @@ def create_credential_capsule(
     )
 
 
-def open_credential_capsule(
-    capsule: CredentialCapsule, password: bytes
-) -> bytes:
+def open_credential_capsule(capsule: CredentialCapsule, password: bytes) -> bytes:
     """Verify capsule authenticity and decrypt with the derived key."""
     if capsule.version != _CAPSULE_VERSION:
         raise ValueError(f"unsupported capsule version: {capsule.version}")

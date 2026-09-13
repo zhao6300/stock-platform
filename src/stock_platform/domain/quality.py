@@ -33,8 +33,6 @@ _SEVERITY_RANK = {
 }
 
 
-
-
 @dataclass(frozen=True, slots=True)
 class QualityRule:
     """A versioned rule to assess canonical data quality."""
@@ -225,7 +223,9 @@ class QualityService:
     ) -> tuple[tuple[QualityIssue, QualityStatus], ...]:
         return tuple(
             (issue, issue.rule.status)
-            for issue in self.daily_bar_issues(daily_bar, security_id, open_on_calendar=open_on_calendar)
+            for issue in self.daily_bar_issues(
+                daily_bar, security_id, open_on_calendar=open_on_calendar
+            )
         )
 
     def fund_nav_issues(
@@ -348,7 +348,6 @@ class QualityService:
             issues=issues,
             generated_at=generated_at,
         )
-
 
 
 def _value(source: DailyBar | FundNav, field: str) -> Decimal | None:

@@ -40,9 +40,7 @@ def _versions() -> CalendarService:
 def test_trading_observation_is_unique_in_market_time_zone() -> None:
     versions = _versions()
 
-    resolved = versions.observation_date(
-        datetime(2026, 1, 1, 23, 59, tzinfo=UTC), kind="TRADING"
-    )
+    resolved = versions.observation_date(datetime(2026, 1, 1, 23, 59, tzinfo=UTC), kind="TRADING")
 
     assert resolved == Success(date(2026, 1, 2))
     assert versions.is_open("CN", date(2026, 6, 30)) is True
@@ -56,6 +54,6 @@ def test_trading_observation_is_unique_in_market_time_zone() -> None:
 def test_missing_applicable_version_is_rejected() -> None:
     versions = _versions()
 
-    assert versions.observation_date(
-        datetime(2027, 1, 1, tzinfo=UTC), kind="TRADING"
-    ) == Failure(CalendarResolutionError("missing"))
+    assert versions.observation_date(datetime(2027, 1, 1, tzinfo=UTC), kind="TRADING") == Failure(
+        CalendarResolutionError("missing")
+    )

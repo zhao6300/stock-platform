@@ -36,7 +36,7 @@ def test_adapter_request_boundary_prevents_gateways(
 ) -> None:
     state = request_allowed_for_adapter_contract(
         declared,
-            supported_version=supported,
+        supported_version=supported,
         probe=CapabilityProbe(outcome=outcome, unsupported=()),
     )
 

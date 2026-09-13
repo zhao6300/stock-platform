@@ -69,9 +69,7 @@ class ResearchRunner:
 
         saved = runner.save(manifest)
         if not isinstance(saved, Success):
-            return Failure(
-                ReplayOutcome(None, (MissingReplayArtifact("manifest", saved.error),))
-            )
+            return Failure(ReplayOutcome(None, (MissingReplayArtifact("manifest", saved.error),)))
 
         result = runner.run(manifest)
         if not isinstance(result, Success):
@@ -86,13 +84,9 @@ class ResearchRunner:
         """Commit the manifest, then publish exactly one derived result."""
         saved = runner.save(manifest)
         if not isinstance(saved, Success):
-            return Failure(
-                ReplayOutcome(None, (MissingReplayArtifact("manifest", saved.error),))
-            )
+            return Failure(ReplayOutcome(None, (MissingReplayArtifact("manifest", saved.error),)))
 
         result = runner.run(manifest)
         if not isinstance(result, Success):
-            return Failure(
-                ReplayOutcome(None, (MissingReplayArtifact("result", result.error),))
-            )
+            return Failure(ReplayOutcome(None, (MissingReplayArtifact("result", result.error),)))
         return result

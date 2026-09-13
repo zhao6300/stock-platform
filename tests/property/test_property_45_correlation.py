@@ -25,11 +25,12 @@ from stock_platform.domain.common import Failure, SeriesPoint
         max_size=8,
     ),
 )
-def test_correlation_uses_aligned_shared_dates(left: list[Decimal], right: list[Decimal | None]) -> None:
+def test_correlation_uses_aligned_shared_dates(
+    left: list[Decimal], right: list[Decimal | None]
+) -> None:
     dates = [date(2025, 1, index + 1) for index in range(min(len(left), len(right)))]
     ordered_right = [
-        SeriesPoint(value_date, value)
-        for value_date, value in zip(dates, right, strict=False)
+        SeriesPoint(value_date, value) for value_date, value in zip(dates, right, strict=False)
     ]
     aligned = [
         (left[index], ordered_right[index].value)
@@ -39,18 +40,14 @@ def test_correlation_uses_aligned_shared_dates(left: list[Decimal], right: list[
     if len(aligned) <= 1:
         return
     left_mean = sum(aligned_left for aligned_left, _ in aligned) / len(aligned)
-    left_variance = sum(
-        (aligned_left - left_mean) ** 2 for aligned_left, _ in aligned
-    )
+    left_variance = sum((aligned_left - left_mean) ** 2 for aligned_left, _ in aligned)
     right_mean = sum(aligned_right for _, aligned_right in aligned) / len(aligned)
-    right_variance = sum(
-        (aligned_right - right_mean) ** 2 for _, aligned_right in aligned
-    )
+    right_variance = sum((aligned_right - right_mean) ** 2 for _, aligned_right in aligned)
     assume(left_variance != 0 and right_variance != 0)
-    expected = (
-        sum((aligned_left - left_mean) * (aligned_right - right_mean) for aligned_left, aligned_right in aligned)
-        / (left_variance * right_variance).sqrt(getcontext())
-    )
+    expected = sum(
+        (aligned_left - left_mean) * (aligned_right - right_mean)
+        for aligned_left, aligned_right in aligned
+    ) / (left_variance * right_variance).sqrt(getcontext())
     result = correlation(
         [SeriesPoint(value_date, value) for value_date, value in zip(dates, left, strict=False)],
         ordered_right,

@@ -32,7 +32,11 @@ def _factors() -> AdjustmentFactorSeries:
 
 
 def _raw_series(dates: tuple[date, ...]) -> tuple[PricePoint, ...]:
-    prices = {date(2025, 1, 1): Decimal("10"), date(2025, 1, 2): Decimal("20"), date(2025, 1, 3): Decimal("30")}
+    prices = {
+        date(2025, 1, 1): Decimal("10"),
+        date(2025, 1, 2): Decimal("20"),
+        date(2025, 1, 3): Decimal("30"),
+    }
     return tuple(PricePoint(observation_date=value, raw_price=prices[value]) for value in dates)
 
 
@@ -49,7 +53,11 @@ def test_adjusted_series_discloses_mode_factor_source_and_version() -> None:
     assert result.value.factor_source is AdjustmentFactorSource.CORPORATE_ACTION
     assert result.value.factor_source_id == "corporate-action-1"
     assert result.value.factor_version_id == "factors-v1"
-    assert [point.raw_price for point in result.value.values] == [Decimal("30"), Decimal("40"), Decimal("30")]
+    assert [point.raw_price for point in result.value.values] == [
+        Decimal("30"),
+        Decimal("40"),
+        Decimal("30"),
+    ]
 
 
 def test_adjusted_subrange_matches_full_series_slice() -> None:

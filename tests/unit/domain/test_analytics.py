@@ -21,7 +21,10 @@ from stock_platform.domain.common import Failure, SeriesPoint, Success
 
 def test_returns_are_precise_on_two_values() -> None:
     value = returns(
-        [SeriesPoint(date(2025, 1, 1), Decimal("1.20")), SeriesPoint(date(2025, 1, 2), Decimal("1.44"))],
+        [
+            SeriesPoint(date(2025, 1, 1), Decimal("1.20")),
+            SeriesPoint(date(2025, 1, 2), Decimal("1.44")),
+        ],
     )
 
     return_point = value.value[0]
@@ -83,7 +86,10 @@ def test_movavg_menus() -> None:
 
 def test_drawdown_is_positive_by_point() -> None:
     result = drawdown(
-        [SeriesPoint(date(2025, 1, 1), Decimal("100")), SeriesPoint(date(2025, 2, 1), Decimal("120"))],
+        [
+            SeriesPoint(date(2025, 1, 1), Decimal("100")),
+            SeriesPoint(date(2025, 2, 1), Decimal("120")),
+        ],
     )
     pointwise, maximum = result.value
     assert pointwise == (Decimal("0"), Decimal("0"))
@@ -116,7 +122,7 @@ def test_volatility_uses_sample_deviation_and_sqrt_252() -> None:
     )
 
     annualized, factor = result.value
-    expected = (Decimal("0.02")**2).sqrt() * Decimal("252").sqrt()
+    expected = (Decimal("0.02") ** 2).sqrt() * Decimal("252").sqrt()
     assert annualized == expected
     assert factor == Decimal("252")
 
@@ -191,6 +197,4 @@ def test_correlation_reports_each_zero_variance_side() -> None:
         ],
     )
 
-    assert result == Failure(
-        UndefinedCorrelation(zero_variance=("right",))
-    )
+    assert result == Failure(UndefinedCorrelation(zero_variance=("right",)))

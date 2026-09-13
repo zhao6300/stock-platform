@@ -514,46 +514,46 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Validates: Requirements 10.10, 10.12**
 
 - [ ] 10. Implement immutable snapshots, manifests, research runs, and replay
-  - [ ] 10.1 Implement canonical Data Snapshot and Research Manifest construction
+  - [x] 10.1 Implement canonical Data Snapshot and Research Manifest construction
     - **Affected modules:** `src/stock_platform/domain/research.py`, `src/stock_platform/application/snapshots.py`, unit tests.
     - **Prerequisites:** 5.4, 7.12, 8.1.
     - **Expected output / verify:** Canonical sorted JSON, content-bound snapshot ID, every glossary manifest field, pinned versions/artifacts, rejected-data confirmation bound to snapshot; run focused tests.
     - _Requirements: 9.11, 11.2-11.3_
-  - [ ] 10.2 Write Property 49 test for complete manifests and content-bound snapshots
+  - [x] 10.2 Write Property 49 test for complete manifests and content-bound snapshots
     - **Affected modules:** `tests/property/test_property_49_manifest_completeness.py`.
     - **Prerequisites:** 10.1, 1.2.
     - **Expected output / verify:** Generated snapshots/runs contain all fields and deterministic digest; run the file with pytest.
     - **Property 49: Research manifests are complete and snapshots content-bound.**
     - **Validates: Requirements 11.2, 11.3**
-  - [ ] 10.3 Implement manifest-before-result Research Runner publication
+  - [x] 10.3 Implement manifest-before-result Research Runner publication
     - **Affected modules:** `src/stock_platform/application/research_runner.py`, repository/object-store ports, fault-injection tests.
     - **Prerequisites:** 10.1, 5.4.
     - **Expected output / verify:** Runner commits exactly one manifest before invoking/publishing analysis results and never publishes orphan results; run focused fault tests.
     - _Requirements: 11.1_
-  - [ ] 10.4 Implement pinned-artifact replay and manifest diffing
+  - [x] 10.4 Implement pinned-artifact replay and manifest diffing
     - **Affected modules:** `src/stock_platform/application/replay.py`, `src/stock_platform/domain/research.py`, unit tests.
     - **Prerequisites:** 10.3, 9.4.
     - **Expected output / verify:** No `latest` resolution, complete missing-artifact collection, deterministic replay comparison, and exact differing-field values; run focused tests.
     - _Requirements: 11.4-11.8_
-  - [ ] 10.5 Write Property 50 test for pinned replay and complete absence failure
+  - [x] 10.5 Write Property 50 test for pinned replay and complete absence failure
     - **Affected modules:** `tests/property/test_property_50_replay_artifacts.py`.
     - **Prerequisites:** 10.4, 1.2.
     - **Expected output / verify:** Generated availability sets resolve only pinned artifacts or publish nothing and list exact missing set; run the file with pytest.
     - **Property 50: Replay uses only pinned artifacts and fails completely on absence.**
     - **Validates: Requirements 11.4, 11.5**
-  - [ ] 10.6 Write Property 51 test for deterministic replay equivalence
+  - [x] 10.6 Write Property 51 test for deterministic replay equivalence
     - **Affected modules:** `tests/property/test_property_51_replay_equivalence.py`.
     - **Prerequisites:** 10.4, 1.2.
     - **Expected output / verify:** Generated discrete/floating outputs meet exact and `1e-10 * max(1, abs(original))` comparisons; run the file with pytest.
     - **Property 51: Deterministic replay is equivalent within the specified numeric tolerance.**
     - **Validates: Requirements 11.6, 11.7**
-  - [ ] 10.7 Write Property 52 test for exact manifest differences
+  - [x] 10.7 Write Property 52 test for exact manifest differences
     - **Affected modules:** `tests/property/test_property_52_manifest_diff.py`.
     - **Prerequisites:** 10.4, 1.2.
     - **Expected output / verify:** Generated manifest pairs return exactly actual differing paths and both values; run the file with pytest.
     - **Property 52: Manifest difference reports are exact.**
     - **Validates: Requirements 11.8**
-  - [ ] 10.8 Validate rejected-snapshot confirmation and research publication/replay integration
+  - [x] 10.8 Validate rejected-snapshot confirmation and research publication/replay integration
     - **Affected modules:** `tests/integration/research/`.
     - **Prerequisites:** 10.2-10.7, 9.1.
     - **Expected output / verify:** Tests cover confirmation gate, manifest-before-result crash points, immutable outputs, missing artifacts, deterministic replay, and diff; run `python -m pytest tests/integration/research -q`.

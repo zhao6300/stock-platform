@@ -92,10 +92,7 @@ def execute_research_query(
             applied_filter_count=len(query.filters),
             returned_count=len(selected),
             rows=tuple(
-                tuple(
-                    (field_name, canonical_value(row[field_name]))
-                    for field_name in sorted(row)
-                )
+                tuple((field_name, canonical_value(row[field_name])) for field_name in sorted(row))
                 for row in selected
             ),
             has_more=has_more,

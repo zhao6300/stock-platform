@@ -36,9 +36,7 @@ class ApplicationContainer:
     compatible_schemas: tuple[str, ...] = ()
     storage: str | None = None
     latest_ingestion: str = "NO_SUCCESSFUL_INGESTION"
-    catalog: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]] = field(
-        default_factory=dict
-    )
+    catalog: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]] = field(default_factory=dict)
     observations: dict[str, Any] = field(default_factory=dict)
     provider_configurations: dict[str, Mapping[str, Any]] = field(default_factory=dict)
     enabled_providers: frozenset[str] = frozenset()
@@ -96,9 +94,7 @@ class ApplicationContainer:
         """Build the local backup inventory source from current state."""
         return BackupPlatformState(
             schema_id=self.schema if self.schema is not None else "schema-v1",
-            configuration=tuple(
-                provider for provider in self.enabled_providers
-            ),
+            configuration=tuple(provider for provider in self.enabled_providers),
             security_master_versions=(),
             security_mappings=(),
             calendars=(),

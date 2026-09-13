@@ -29,7 +29,5 @@ def _profile(confirmation_time: datetime) -> ComplianceProfileVersion:
 def test_compliance_history_is_append_only() -> None:
     history = ComplianceHistory()
     assert not history.profile_history()
-    first = history.append(
-        _profile(datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC))
-    )
+    first = history.append(_profile(datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)))
     assert first.version == history.profile_history()[0].version

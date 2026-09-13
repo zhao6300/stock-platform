@@ -71,9 +71,7 @@ class ProviderEnvelope:
             retrieved_at=self.retrieved_at,
         )
 
-    def to_resp(
-        self, *, publish: bool = False
-    ) -> ProviderProvenance | Mapping[str, object]:
+    def to_resp(self, *, publish: bool = False) -> ProviderProvenance | Mapping[str, object]:
         provenance = self.provenance()
         if publish:
             return provenance
@@ -95,8 +93,6 @@ class ProviderAdapter(Protocol):
 
     async def capabilities(self) -> ProviderCapabilities: ...
 
-    async def fetch(
-        self, request: ProviderRequest
-    ) -> AsyncIterator[ProviderEnvelope]: ...
+    async def fetch(self, request: ProviderRequest) -> AsyncIterator[ProviderEnvelope]: ...
 
     def normalize(self, envelope: ProviderEnvelope) -> Mapping[str, object]: ...

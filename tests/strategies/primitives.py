@@ -44,4 +44,6 @@ def durations(
     max_seconds: int = 365 * 24 * 60 * 60,
 ) -> st.SearchStrategy[timedelta]:
     """Generate ordered durations for calendar and retry tests."""
-    return st.timedeltas(min_value=timedelta(seconds=min_seconds), max_value=timedelta(seconds=max_seconds))
+    return st.timedeltas(
+        min_value=timedelta(seconds=min_seconds), max_value=timedelta(seconds=max_seconds)
+    )

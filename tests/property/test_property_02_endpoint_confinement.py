@@ -24,9 +24,7 @@ class RecordingTransport:
 
 
 class FakeResolver:
-    def __call__(
-        self, host: str, service: int | None = None, family: int = 0, type: int = 0
-    ):
+    def __call__(self, host: str, service: int | None = None, family: int = 0, type: int = 0):
         if host != "approved.example.test":
             raise OSError("resolution blocked in local tests")
         return [(2, 1, 6, "", ("93.184.216.34", service or 443))]
@@ -45,9 +43,7 @@ redirect_destinations = st.one_of(
 
 
 @given(url=allowed_urls, redirect_url=redirect_destinations)
-def test_gateway_transmits_only_within_configured_endpoints(
-    url: str, redirect_url: str
-) -> None:
+def test_gateway_transmits_only_within_configured_endpoints(url: str, redirect_url: str) -> None:
     transport = RecordingTransport()
     gateway = NetworkGateway(
         endpoints={
@@ -73,10 +69,7 @@ def test_gateway_transmits_only_within_configured_endpoints(
     )
 
     assert response.status_code == httpx.codes.OK
-    assert all(
-        item.startswith("https://approved.example.test/")
-        for item in transport.urls
-    )
+    assert all(item.startswith("https://approved.example.test/") for item in transport.urls)
 
 
 @given(url=blocked_urls)

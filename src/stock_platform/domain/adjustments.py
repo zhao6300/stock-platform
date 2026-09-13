@@ -266,7 +266,9 @@ class AdjustmentService:
         return tuple(
             PricePoint(
                 observation_date=price_point.observation_date,
-                raw_price=price_point.raw_price * factor_by_date[price_point.observation_date] / anchor,
+                raw_price=price_point.raw_price
+                * factor_by_date[price_point.observation_date]
+                / anchor,
             )
             for price_point in raw_series
         )

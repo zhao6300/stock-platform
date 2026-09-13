@@ -99,16 +99,22 @@ class IdentityRegistry:
 
     def register(self, version: IdentityVersion) -> None:
         identity = version.identity
-        canonical = self._canonical_id(identity.market, identity.instrument_type, identity.local_code)
-        derived = version if version.canonical_security_id == canonical else IdentityVersion(
-            version_id=_version_id(canonical, identity.valid_from),
-            canonical_security_id=canonical,
-            identity=identity,
-            name=version.name,
-            listing_date=version.listing_date,
-            status=version.status,
-            currency=version.currency,
-            termination_date=version.termination_date,
+        canonical = self._canonical_id(
+            identity.market, identity.instrument_type, identity.local_code
+        )
+        derived = (
+            version
+            if version.canonical_security_id == canonical
+            else IdentityVersion(
+                version_id=_version_id(canonical, identity.valid_from),
+                canonical_security_id=canonical,
+                identity=identity,
+                name=version.name,
+                listing_date=version.listing_date,
+                status=version.status,
+                currency=version.currency,
+                termination_date=version.termination_date,
+            )
         )
         self._identities.setdefault(canonical, []).append(derived)
 
@@ -143,10 +149,12 @@ class IdentityRegistry:
             return Failure(UnresolvedIdentifier(provider, provider_id, observation_date))
         if len(matches) > 1:
             return Failure(
-                AmbiguousIdentifier(tuple(
-                    (mapping.canonical_security_id, mapping.valid_from, mapping.valid_to)
-                    for mapping in matches
-                ))
+                AmbiguousIdentifier(
+                    tuple(
+                        (mapping.canonical_security_id, mapping.valid_from, mapping.valid_to)
+                        for mapping in matches
+                    )
+                )
             )
         return Success(ResolvedIdentifier(matches[0].canonical_security_id))
 

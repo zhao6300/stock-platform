@@ -28,7 +28,7 @@ def _factor_series(
         source_id=source_id,
         retrieved_at=datetime(2025, 12, 1, tzinfo=UTC),
         points=points,
-)
+    )
 
 
 def test_adjustment_factor_preserves_raw_value() -> None:

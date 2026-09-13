@@ -15,8 +15,10 @@ from stock_platform.domain.backtesting import (
 class Passive:
     api_version = "daily.v1"
     required_capabilities = frozenset()
+
     def on_day_close(self, context: DayContext) -> None:
         return ()
+
 
 def missing_report(policy: str) -> tuple:
     dates = (date(2026, 1, 2), date(2026, 1, 5), date(2026, 1, 12))
@@ -34,6 +36,7 @@ def missing_report(policy: str) -> tuple:
     )
     report = engine.run().value
     return report.portfolio_valuation[-1], report.performance_calculation[-1]
+
 
 def test_unavailable_and_five_session_policies_are_exhaustive() -> None:
     unavailable, unavailable_performance = missing_report("UNAVAILABLE")

@@ -12,9 +12,7 @@ from tests.strategies.primitives import uids
 
 
 @given(owner_uid=uids(), current_uid=uids())
-def test_owner_isolation_permits_only_the_exact_uid(
-    owner_uid: int, current_uid: int
-) -> None:
+def test_owner_isolation_permits_only_the_exact_uid(owner_uid: int, current_uid: int) -> None:
     state = {"marker": f"{owner_uid}:{current_uid}"}
     before = sha256(repr(state).encode()).hexdigest()
 

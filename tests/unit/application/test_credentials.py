@@ -35,6 +35,4 @@ def test_exact_selection_deletes_only_selected_credentials() -> None:
         remaining=["delete_me", "keep_me"],
     )
 
-    assert result == Success(
-        CredentialSelection(selected=("delete_me",), remaining=("keep_me",))
-    )
+    assert result == Success(CredentialSelection(selected=("delete_me",), remaining=("keep_me",)))

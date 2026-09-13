@@ -40,7 +40,9 @@ def provider_list() -> None:
 def provider_configure(
     provider: str,
     endpoint: str,
-    credential_reference: str = typer.Option(..., prompt=False, help="Required Keychain reference."),
+    credential_reference: str = typer.Option(
+        ..., prompt=False, help="Required Keychain reference."
+    ),
 ) -> None:
     """Record one local provider configuration and credential reference."""
     configuration = context.container.configure_provider(

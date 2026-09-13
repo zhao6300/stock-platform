@@ -54,10 +54,7 @@ def test_quality_status_is_the_maximum_applicable_severity(
         )
     if open_on_calendar is None and not (invalid_price or invalid_total or inverted_ohlc):
         assert status == QualityStatus.WARNING
-        assert all(
-            issue.missing_input == "CALENDAR"
-            for issue in issues
-        )
+        assert all(issue.missing_input == "CALENDAR" for issue in issues)
     elif invalid_price or invalid_total or inverted_ohlc or open_on_calendar is False:
         assert status == QualityStatus.REJECTED
     else:

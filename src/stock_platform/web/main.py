@@ -160,9 +160,7 @@ async def enable_provider(
     """Atomically activate one configured provider and pin its contract."""
     enforce_loopback(request, write=True)
     try:
-        return dict(
-            container.enable_provider(provider_id, body.contract_version)
-        )
+        return dict(container.enable_provider(provider_id, body.contract_version))
     except LookupError as error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -174,9 +172,7 @@ async def enable_provider(
 async def set_credential(body: CredentialSetRequest, request: Request) -> dict[str, str]:
     """Store a Keychain reference; never echo or expose secret bytes."""
     enforce_loopback(request, write=True)
-    container.credential_references = frozenset(
-        (*container.credential_references, body.reference)
-    )
+    container.credential_references = frozenset((*container.credential_references, body.reference))
     return {"reference": body.reference}
 
 
@@ -191,9 +187,7 @@ async def delete_credential(reference: str, request: Request) -> dict[str, str]:
 
 
 @app.post("/api/v1/snapshots", status_code=status.HTTP_201_CREATED)
-async def create_snapshot(
-    body: SnapshotCreateRequest, request: Request
-) -> dict[str, str]:
+async def create_snapshot(body: SnapshotCreateRequest, request: Request) -> dict[str, str]:
     """Freeze one snapshot and return only its canonical ID."""
     enforce_loopback(request, write=True)
     snapshot_id = container.create_snapshot(body.to_domain())
@@ -201,9 +195,7 @@ async def create_snapshot(
 
 
 @app.post("/api/v1/snapshots/{snapshot_id}/confirm-rejected")
-async def confirm_rejected_snapshot(
-    snapshot_id: str, request: Request
-) -> dict[str, str]:
+async def confirm_rejected_snapshot(snapshot_id: str, request: Request) -> dict[str, str]:
     """Record explicit confirmation for one pinned rejected snapshot."""
     enforce_loopback(request, write=True)
     try:
@@ -214,6 +206,8 @@ async def confirm_rejected_snapshot(
             detail=str(error),
         ) from error
     return {"snapshot_id": snapshot_id}
+
+
 @app.get("/", response_class=HTMLResponse)
 async def research_page() -> str:
     """Return the local-only research shell with required labels."""

@@ -71,7 +71,9 @@ def test_identity_registry_stable_ids_use_three_component_keys(
 
 def test_invalid_identity_is_rejected() -> None:
     with pytest.raises(ValueError):
-        IdentityKey(market="XSHG", instrument_type="A_Share", local_code="", valid_from=date(2026,1,1))
+        IdentityKey(
+            market="XSHG", instrument_type="A_Share", local_code="", valid_from=date(2026, 1, 1)
+        )
 
 
 @given(first_key=_local_code(), second_key=_local_code())

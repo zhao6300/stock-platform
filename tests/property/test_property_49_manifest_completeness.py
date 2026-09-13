@@ -20,9 +20,7 @@ from stock_platform.domain.research import (
     dataset_version_id=st.text(min_size=1, max_size=8),
     object_count=st.integers(min_value=0, max_value=3),
 )
-def test_snapshot_ids_are_content_bound(
-    dataset_version_id: str, object_count: int
-) -> None:
+def test_snapshot_ids_are_content_bound(dataset_version_id: str, object_count: int) -> None:
     snapshot = DataSnapshotManifest(
         dataset_version_id=dataset_version_id,
         objects=tuple(

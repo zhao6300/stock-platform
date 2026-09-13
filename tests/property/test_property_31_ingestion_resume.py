@@ -31,7 +31,4 @@ def test_resume_planning_is_the_finalized_date_complement(
     )
     assert isinstance(result, Success)
     assert result.value.version_id
-    assert (
-        result.value.requested_dates
-        == tuple(d for d in expected if d not in finalized)
-    )
+    assert result.value.requested_dates == tuple(d for d in expected if d not in finalized)

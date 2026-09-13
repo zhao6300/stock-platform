@@ -22,7 +22,7 @@ def _profile(export_permission: str) -> ComplianceProfileVersion:
         permitted_purposes=("PERSONAL_RESEARCH",),
         retention_permission="PROHIBITED",
         export_permission=export_permission,  # type: ignore[arg-type]
-    confirmation_time=datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC),
+        confirmation_time=datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC),
     )
 
 

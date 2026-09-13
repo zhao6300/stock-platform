@@ -53,8 +53,7 @@ class MvpPolicy:
                     "Requested capabilities are unavailable in this MVP.",
                     context={
                         "unsupported": [
-                            item.value
-                            for item in sorted(requested, key=lambda item: item.value)
+                            item.value for item in sorted(requested, key=lambda item: item.value)
                         ]
                     },
                 )

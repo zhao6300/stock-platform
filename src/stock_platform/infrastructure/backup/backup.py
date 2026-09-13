@@ -57,9 +57,9 @@ def default_backup_manifest(state: BackupPlatformState) -> BackupManifest:
         schema_id=state.get(
             "schema_id",
             "schema-v1",
-            )
-            if isinstance(state, Mapping)
-            else state.schema_id,
+        )
+        if isinstance(state, Mapping)
+        else state.schema_id,
         datasets=datasets,
     )
 

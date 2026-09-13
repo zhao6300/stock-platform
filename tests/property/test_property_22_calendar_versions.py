@@ -8,7 +8,9 @@ from hypothesis import strategies as st
 from stock_platform.domain.calendars import CalendarService, CalendarVersion
 
 
-def _version(kind: str, valid_from: date, valid_to: date, market: str, timezone: str) -> CalendarVersion:
+def _version(
+    kind: str, valid_from: date, valid_to: date, market: str, timezone: str
+) -> CalendarVersion:
     open_dates = frozenset([valid_from]) if kind == "TRADING" else None
     expected_dates = frozenset([valid_from]) if kind == "VALUATION" else None
     return CalendarVersion(
@@ -29,11 +31,11 @@ def _version(kind: str, valid_from: date, valid_to: date, market: str, timezone:
             _version,
             market=st.sampled_from(("CN", "HK", "FUND")),
             timezone=st.sampled_from(("UTC", "Asia/Shanghai", "Hongkong")),
-                valid_from=st.dates(min_value=date(2020, 1, 1), max_value=date(2026, 12, 31)),
-                valid_to=st.dates(
-                    min_value=date(2020, 1, 2),
-                    max_value=date(2027, 12, 31),
-                ),
+            valid_from=st.dates(min_value=date(2020, 1, 1), max_value=date(2026, 12, 31)),
+            valid_to=st.dates(
+                min_value=date(2020, 1, 2),
+                max_value=date(2027, 12, 31),
+            ),
             kind=st.sampled_from(("TRADING", "VALUATION")),
         )
     )

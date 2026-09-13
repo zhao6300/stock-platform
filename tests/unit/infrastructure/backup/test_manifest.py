@@ -17,7 +17,9 @@ from stock_platform.infrastructure.backup.manifest import (
 )
 
 
-def _dataset(path: Path, schema_id: str = "schema-v1", rows: int = 1, record: bytes = b"row") -> DatasetManifest:
+def _dataset(
+    path: Path, schema_id: str = "schema-v1", rows: int = 1, record: bytes = b"row"
+) -> DatasetManifest:
     return DatasetManifest(
         name=path.name,
         schema_id=schema_id,

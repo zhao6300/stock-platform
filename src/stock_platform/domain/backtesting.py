@@ -11,9 +11,7 @@ from stock_platform.domain.common import Failure, Result, Success, canonical_val
 type MissingDecimal = Decimal | None
 type SignalDirection = Literal["BUY", "SELL"]
 type MissingPricePolicy = Literal["UNAVAILABLE", "FIVE_SESSION_FALLBACK"]
-type TradabilityStatus = Literal[
-    "OPEN", "SUSPENDED", "PRICE_LIMITED", "TERMINATED", "UNKNOWN"
-]
+type TradabilityStatus = Literal["OPEN", "SUSPENDED", "PRICE_LIMITED", "TERMINATED", "UNKNOWN"]
 type DataQualityStatus = Literal["OK", "WARNING", "REJECTED", "UNKNOWN"]
 
 
@@ -197,9 +195,15 @@ class BacktestReport:
         return {
             "disclosure": self.disclosure.as_dict(),
             "signal_generation": [canonical_value(row) for row in self.signal_generation],
-            "simulated_execution": [canonical_value(self._trade_dict(row)) for row in self.simulated_execution],
-            "portfolio_valuation": [canonical_value(row.__dict__) for row in self.portfolio_valuation],
-            "performance_calculation": [canonical_value(row.__dict__) for row in self.performance_calculation],
+            "simulated_execution": [
+                canonical_value(self._trade_dict(row)) for row in self.simulated_execution
+            ],
+            "portfolio_valuation": [
+                canonical_value(row.__dict__) for row in self.portfolio_valuation
+            ],
+            "performance_calculation": [
+                canonical_value(row.__dict__) for row in self.performance_calculation
+            ],
             "survivorship_warning": self.survivorship_warning,
             "affected_quality": [canonical_value(row) for row in self.affected_quality],
             "disclaimer": self.disclaimer,
@@ -231,6 +235,8 @@ def _round(value: Decimal, precision: int, rounding: str) -> Decimal:
         return value.quantize(Decimal(1).scaleb(-precision), rounding=rounding)
     except (InvalidOperation, ValueError) as error:
         raise ValueError("quantization failed") from error
+
+
 # ruff: noqa: PLR0912 PLR0913 PLR0915
 
 
@@ -256,7 +262,6 @@ class BacktestEngine:
             raise ValueError("missing-price policy must be a supported option")
         if any(bar.trading_date not in self.calendar.open_dates for bar in self.bars):
             raise ValueError("daily bars must use open trading sessions")
-
 
     def run(self) -> Result[BacktestReport, UnsupportedMVP | InvalidRequest]:
         unsupported = self.strategy.required_capabilities & _UNSUPPORTED_CAPABILITIES
@@ -324,7 +329,12 @@ class BacktestEngine:
                     pending.append(PendingSignal(trading_date, next_date, signal))
 
             for instrument in self._universe():
-                valuation = self._value_instrument(trading_date, instrument, bars.get(instrument), positions.get(instrument, Decimal(0)))
+                valuation = self._value_instrument(
+                    trading_date,
+                    instrument,
+                    bars.get(instrument),
+                    positions.get(instrument, Decimal(0)),
+                )
                 valuations.append(valuation)
             universe = self._universe()
             universe_values = [
@@ -339,14 +349,18 @@ class BacktestEngine:
 
             if not unavailable:
                 portfolio_value = sum(universe_values, Decimal(0)) + cash
-                simple_return = None if previous_value == 0 else portfolio_value / previous_value - 1
+                simple_return = (
+                    None if previous_value == 0 else portfolio_value / previous_value - 1
+                )
                 if previous_value != 0:
                     if running_max is None or portfolio_value > running_max:
                         running_max = portfolio_value
                     drawdown = portfolio_value / running_max - 1
                 else:
                     drawdown = None
-                performance = PerformanceRecord(trading_date, True, portfolio_value, simple_return, drawdown)
+                performance = PerformanceRecord(
+                    trading_date, True, portfolio_value, simple_return, drawdown
+                )
                 previous_value = portfolio_value
                 running_max = max(running_max or Decimal(0), portfolio_value)
             else:
@@ -445,19 +459,52 @@ class BacktestEngine:
         slip_percentage = self.cost_model.slippage_bps / Decimal(10000)
         slip = bar.close * slip_percentage
         execution_price = (
-            _round(bar.close + slip, self.cost_model.price_precision, self.cost_model.price_rounding)
+            _round(
+                bar.close + slip, self.cost_model.price_precision, self.cost_model.price_rounding
+            )
             if signal.direction == "BUY"
-            else _round(bar.close - slip, self.cost_model.price_precision, self.cost_model.price_rounding)
+            else _round(
+                bar.close - slip, self.cost_model.price_precision, self.cost_model.price_rounding
+            )
         )
-        gross = _round(signal.requested_quantity * execution_price, self.cost_model.currency_precision, self.cost_model.currency_rounding)
-        commission = max(self.cost_model.minimum_fee, _round(gross * self.cost_model.commission_rate, self.cost_model.currency_precision, self.cost_model.currency_rounding))
-        tax = _round(gross * self.cost_model.tax_rate, self.cost_model.currency_precision, self.cost_model.currency_rounding)
-        total_cost = _round(commission + tax, self.cost_model.currency_precision, self.cost_model.currency_rounding)
-        cash_needed = _round(gross + total_cost, self.cost_model.currency_precision, self.cost_model.currency_rounding)
+        gross = _round(
+            signal.requested_quantity * execution_price,
+            self.cost_model.currency_precision,
+            self.cost_model.currency_rounding,
+        )
+        commission = max(
+            self.cost_model.minimum_fee,
+            _round(
+                gross * self.cost_model.commission_rate,
+                self.cost_model.currency_precision,
+                self.cost_model.currency_rounding,
+            ),
+        )
+        tax = _round(
+            gross * self.cost_model.tax_rate,
+            self.cost_model.currency_precision,
+            self.cost_model.currency_rounding,
+        )
+        total_cost = _round(
+            commission + tax, self.cost_model.currency_precision, self.cost_model.currency_rounding
+        )
+        cash_needed = _round(
+            gross + total_cost,
+            self.cost_model.currency_precision,
+            self.cost_model.currency_rounding,
+        )
         if signal.direction == "BUY" and cash < cash_needed:
             return self._blocked_trade(trading_date, signal, "INSUFFICIENT_CASH")
 
-        cash_change = cash_needed if signal.direction == "BUY" else _round(gross - total_cost, self.cost_model.currency_precision, self.cost_model.currency_rounding)
+        cash_change = (
+            cash_needed
+            if signal.direction == "BUY"
+            else _round(
+                gross - total_cost,
+                self.cost_model.currency_precision,
+                self.cost_model.currency_rounding,
+            )
+        )
         record = TradeRecord(
             trading_date=trading_date,
             instrument=signal.instrument,
@@ -471,7 +518,9 @@ class BacktestEngine:
             total_cost=total_cost,
             net_cash_change=cash_change,
             cash_delta=-cash_change if signal.direction == "BUY" else cash_change,
-            position_delta=signal.requested_quantity if signal.direction == "BUY" else -signal.requested_quantity,
+            position_delta=signal.requested_quantity
+            if signal.direction == "BUY"
+            else -signal.requested_quantity,
         )
         self.entries.append(record)
         return (
@@ -481,7 +530,9 @@ class BacktestEngine:
             signal.requested_quantity if signal.direction == "BUY" else -signal.requested_quantity,
         )
 
-    def _blocked_reason(self, tradability: Tradability | None, direction: SignalDirection, held_quantity: Decimal) -> str | None:
+    def _blocked_reason(
+        self, tradability: Tradability | None, direction: SignalDirection, held_quantity: Decimal
+    ) -> str | None:
         status = tradability.status if tradability is not None else "UNKNOWN"
         if status != "OPEN":
             return status
@@ -489,19 +540,21 @@ class BacktestEngine:
             return "NO_POSITION"
         return None
 
-    def _blocked_trade(self, trading_date: date, signal: Signal, reason: str) -> tuple[TradeRecord, Decimal | None, Decimal, Decimal]:
+    def _blocked_trade(
+        self, trading_date: date, signal: Signal, reason: str
+    ) -> tuple[TradeRecord, Decimal | None, Decimal, Decimal]:
         record = TradeRecord(
-                trading_date=trading_date,
-                instrument=signal.instrument,
-                direction=signal.direction,
-                requested_quantity=signal.requested_quantity,
-                filled_quantity=Decimal(0),
-                reason=reason,
-                execution_price=None,
-                gross_value=None,
-                cost_components={"commission": Decimal(0), "tax": Decimal(0)},
-                total_cost=Decimal(0),
-                net_cash_change=Decimal(0),
+            trading_date=trading_date,
+            instrument=signal.instrument,
+            direction=signal.direction,
+            requested_quantity=signal.requested_quantity,
+            filled_quantity=Decimal(0),
+            reason=reason,
+            execution_price=None,
+            gross_value=None,
+            cost_components={"commission": Decimal(0), "tax": Decimal(0)},
+            total_cost=Decimal(0),
+            net_cash_change=Decimal(0),
             cash_delta=Decimal(0),
             position_delta=Decimal(0),
         )
@@ -543,7 +596,7 @@ class BacktestEngine:
     def _fallback_date(self, trading_date: date, instrument: str) -> date | None:
         dates = self.calendar.dates
         index = dates.index(trading_date)
-        for prior in reversed(dates[max(0, index - 5): index]):
+        for prior in reversed(dates[max(0, index - 5) : index]):
             bar = self._bar(prior, instrument)
             if bar is not None and bar.close > 0:
                 return prior
@@ -551,6 +604,10 @@ class BacktestEngine:
 
     def _bar(self, trading_date: date, instrument: str) -> DailyBar | None:
         return next(
-            (bar for bar in self.bars if bar.trading_date == trading_date and bar.instrument == instrument),
+            (
+                bar
+                for bar in self.bars
+                if bar.trading_date == trading_date and bar.instrument == instrument
+            ),
             None,
         )

@@ -41,7 +41,10 @@ class DataSnapshotManifest:
     def as_dict(self) -> JsonObject:
         return {
             "dataset_version_id": self.dataset_version_id,
-            "objects": [{"rows": item.rows, "schema_id": item.schema_id, "sha256": item.sha256} for item in self.objects],
+            "objects": [
+                {"rows": item.rows, "schema_id": item.schema_id, "sha256": item.sha256}
+                for item in self.objects
+            ],
             "security_master_versions": list(self.security_master_versions),
             "mapping_versions": list(self.mapping_versions),
             "calendar_versions": list(self.calendar_versions),
@@ -95,7 +98,10 @@ class ResearchManifest:
             "run_id": str(self.run_id),
             "snapshot_id": self.snapshot_id,
             "security_scope": list(self.security_scope),
-            "date_range": {"start": canonical_json(self.date_range.start), "end": canonical_json(self.date_range.end)},
+            "date_range": {
+                "start": canonical_json(self.date_range.start),
+                "end": canonical_json(self.date_range.end),
+            },
             "providers": list(self.providers),
             "calendar_versions": list(self.calendar_versions),
             "adjustment_mode": self.adjustment_mode,
@@ -172,12 +178,18 @@ def missing_replay_artifacts(
     return tuple(missing)
 
 
-def manifest_diff(left: ResearchManifest, right: ResearchManifest) -> tuple[tuple[str, Any, Any], ...]:
+def manifest_diff(
+    left: ResearchManifest, right: ResearchManifest
+) -> tuple[tuple[str, Any, Any], ...]:
     """Compare two manifests and return exactly their differing field values."""
     left_dict = left.as_dict()
     right_dict = right.as_dict()
     paths = sorted(set(left_dict) | set(right_dict))
-    return tuple((path, left_dict[path], right_dict[path]) for path in paths if left_dict[path] != right_dict[path])
+    return tuple(
+        (path, left_dict[path], right_dict[path])
+        for path in paths
+        if left_dict[path] != right_dict[path]
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -199,7 +211,11 @@ def replay_differences(
         left = original.get(path)
         right = replayed.get(path)
         equal = left == right
-        if not equal and isinstance(left, (int, float, Decimal)) and isinstance(right, (int, float, Decimal)):
+        if (
+            not equal
+            and isinstance(left, (int, float, Decimal))
+            and isinstance(right, (int, float, Decimal))
+        ):
             tolerance = Decimal("1e-10") * Decimal(max(1, abs(float(left))))
             equal = abs(Decimal(float(left)) - Decimal(float(right))) <= tolerance
         if not equal:

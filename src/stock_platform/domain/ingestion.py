@@ -59,9 +59,7 @@ def _count_sequences(
     )
 
 
-def _count_true(
-    outcomes: Sequence[ObservationRunOutcome], attribute: str
-) -> int:
+def _count_true(outcomes: Sequence[ObservationRunOutcome], attribute: str) -> int:
     return sum(getattr(outcome, attribute) for outcome in outcomes)
 
 

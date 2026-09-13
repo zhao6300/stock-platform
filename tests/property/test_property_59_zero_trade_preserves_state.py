@@ -14,8 +14,10 @@ from stock_platform.domain.backtesting import (
 class Unsupported:
     api_version = "daily.v1"
     required_capabilities = frozenset({"short_selling"})
+
     def on_day_close(self, context) -> None:
         raise AssertionError("strategy must not be called")
+
 
 def test_unsupported_capabilities_preserve_initial_state() -> None:
     dates = (date(2026, 1, 2), date(2026, 1, 5))

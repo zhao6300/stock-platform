@@ -32,12 +32,12 @@ def unique_without_duplicates(values: list[str]) -> bool:
 
 @given(
     provider=st.from_regex(r"\w+", fullmatch=True),
-    selected=st.lists(
-        st.from_regex(r"\w+", fullmatch=True), max_size=5
-    ).filter(unique_without_duplicates),
-    kept=st.lists(
-        st.from_regex(r"\w+", fullmatch=True), max_size=5
-    ).filter(unique_without_duplicates),
+    selected=st.lists(st.from_regex(r"\w+", fullmatch=True), max_size=5).filter(
+        unique_without_duplicates
+    ),
+    kept=st.lists(st.from_regex(r"\w+", fullmatch=True), max_size=5).filter(
+        unique_without_duplicates
+    ),
 )
 def test_selected_credentials_are_deleted_exactly_and_kept_references_remain(
     provider: str,

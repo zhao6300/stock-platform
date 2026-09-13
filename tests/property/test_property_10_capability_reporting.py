@@ -17,9 +17,7 @@ from stock_platform.providers.capabilities import CapabilityValue
 def test_capability_values_preserve_known_and_unknown_semantics(
     reported: bool, rational_value: object | None
 ) -> None:
-    capability = CapabilityValue(
-        "provider-capability", rational_value, reported
-    )
+    capability = CapabilityValue("provider-capability", rational_value, reported)
 
     if reported:
         assert capability.reported is True

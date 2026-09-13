@@ -5,6 +5,7 @@ from decimal import Decimal
 
 type ProviderCategory = str
 
+
 @dataclass(frozen=True, slots=True)
 class RateLimitError(Exception):
     """A provider-facing request was rejected for exceeding a request limit."""

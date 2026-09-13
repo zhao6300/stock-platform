@@ -18,9 +18,7 @@ type ExportCategory = Literal[
 _PERMITTED_EXPORT_CATEGORIES: dict[ExportPermission, frozenset[ExportCategory]] = {
     "PROHIBITED": frozenset(),
     "DERIVED_RESULTS_ONLY": frozenset({"DERIVED_RESULTS"}),
-    "NORMALIZED_PROVIDER_DATA": frozenset(
-        {"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA"}
-    ),
+    "NORMALIZED_PROVIDER_DATA": frozenset({"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA"}),
     "RAW_PROVIDER_DATA": frozenset(
         {"DERIVED_RESULTS", "NORMALIZED_PROVIDER_DATA", "RAW_PROVIDER_DATA"}
     ),
