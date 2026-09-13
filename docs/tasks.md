@@ -651,7 +651,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 1.1-1.8, 3.3, 4.7, 8.9, 10.1, 10.10-10.13, 12.12-12.16, 13.3-13.4, 14.1_
 
 - [ ] 13. Implement backup, restore, migration, and local recovery
-  - [ ] 13.1 Implement backup inventory, manifest, count/checksum verification, and atomic publication
+  - [x] 13.1 Implement backup inventory, manifest, count/checksum verification, and atomic publication
     - **Affected modules:** `src/stock_platform/infrastructure/backup/backup.py`, `manifest.py`, integration tests.
     - **Prerequisites:** 5.4, 6.11, 12.1.
     - **Expected output / verify:** Write-lock/SQLite snapshot/referenced-object copy, exact required inventory, secret-free default, per-dataset counts/checksums, independent reread, and restorable only after all pass; run focused tests.
@@ -662,7 +662,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated platform states include exactly required permitted references and no plaintext credentials; run the file with pytest.
     - **Property 63: Default backup inventory is complete and secret-free.**
     - **Validates: Requirements 14.3**
-  - [ ] 13.3 Implement optional encrypted credential capsule failure semantics
+  - [x] 13.3 Implement optional encrypted credential capsule failure semantics
     - **Affected modules:** `src/stock_platform/infrastructure/backup/encryption.py`, fault-injection tests.
     - **Prerequisites:** 13.1, 6.11.
     - **Expected output / verify:** Password-derived AES-256-GCM capsule is complete only after encryption verification; any failure deletes all current-operation output and preserves prior data; run focused tests.
@@ -672,7 +672,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 13.1.
     - **Expected output / verify:** Preflight verifies schema/counts/checksums, restores every item to a new directory, re-verifies, atomically switches, and returns unchanged pre-state on any failure; run focused fault tests.
     - _Requirements: 14.4-14.5, 14.8_
-  - [ ] 13.5 Implement migration manager with verified pre-migration backup
+  - [x] 13.5 Implement migration manager with verified pre-migration backup
     - **Affected modules:** `src/stock_platform/infrastructure/sqlite/migration.py`, Alembic integration tests.
     - **Prerequisites:** 13.1, 13.4, 5.1.
     - **Expected output / verify:** Schema/data-layout changes occur only after a restorable backup, execute/verify in a copied work directory, and atomically switch or retain original version/data; run focused tests.
