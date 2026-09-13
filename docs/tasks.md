@@ -182,7 +182,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** `daily_bar.v1`/`fund_nav.v1` schemas, Decimal preservation, temp-write/fsync/schema-row-hash verification, atomic SHA-256 publish, and immutable reads; run focused integration tests.
     - _Requirements: 1.3, 2.8, 7.2-7.4, 8.1_
-  - [ ] 5.4 Implement atomic dataset publication across Parquet and SQLite
+  - [x] 5.4 Implement atomic dataset publication across Parquet and SQLite
     - **Affected modules:** `src/stock_platform/infrastructure/parquet/publisher.py`, `src/stock_platform/application/publication.py`, fault-injection tests.
     - **Prerequisites:** 5.2, 5.3.
     - **Expected output / verify:** Files publish before one SQLite reference transaction; failures expose no half-published dataset and leave only safely reclaimable unreferenced objects; run fault-injection tests.
