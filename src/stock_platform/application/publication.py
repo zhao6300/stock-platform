@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pyarrow as pa  # type: ignore[import-untyped]
 
+from stock_platform.application.ports import DatasetPublisher
 from stock_platform.domain.common import Result, Success
 from stock_platform.domain.ingestion import IngestionRangeError
-from stock_platform.infrastructure.parquet.publisher import DatasetPublisher
 
 
 def publish_dataset(
