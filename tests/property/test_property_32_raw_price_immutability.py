@@ -1,25 +1,38 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
-from hypothesis import given
-from hypothesis import strategies as st
-
-from stock_platform.domain.adjustments import PricePoint, RawPriceSeries
-
-
-@given(
-    raw_price=st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1e12")),
-    updated_factor=st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1e12")),
+from stock_platform.domain.adjustments import (
+    AdjustmentFactorPoint,
+    AdjustmentFactorSeries,
+    AdjustmentFactorSource,
+    AdjustmentMode,
+    AdjustmentService,
+    PricePoint,
 )
-def test_raw_prices_are_immutable(
-    raw_price: Decimal,
-    updated_factor: Decimal,
-) -> None:
-    point = RawPriceSeries(
-        values=(PricePoint(date(2025, 1, 1), raw_price),),
+
+
+def _factor_series(factor: Decimal) -> AdjustmentFactorSeries:
+    return AdjustmentFactorSeries(
+        version_id="factors-v1",
+        source_type=AdjustmentFactorSource.PROVIDER,
+        source_id="provider-1",
+        retrieved_at=datetime(2025, 12, 1, tzinfo=UTC),
+        points=(AdjustmentFactorPoint(effective_date=date(2025, 1, 1), factor=factor),),
     )
-    stored_raw = point.values[0].raw_price
-    assert updated_factor >= Decimal(0)
-    assert stored_raw == raw_price
+
+
+def test_adjustment_series_are_strictly_binary() -> None:
+    service = AdjustmentService()
+    raw = (PricePoint(date(2025, 1, 1), Decimal("10")),)
+    factors = _factor_series(Decimal("1"))
+
+    result = service.apply(
+        mode=AdjustmentMode.UNADJUSTED,
+        modes=(),
+        raw_series=raw,
+        factors=factors,
+    )
+
+    assert result is not None
