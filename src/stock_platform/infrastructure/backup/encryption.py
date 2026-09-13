@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 _SALT_SIZE = 32
 _KEY_SIZE = 32
-_SCRYPT_WORK_FACTOR = 1 << 12
+_SCRYPT_WORK_FACTOR = 1 << 14
 _SCRYPT_BLOCK_SIZE = 8
 _SCRYPT_PARALLELIZATION = 1
 _NONCE_SIZE = 12
