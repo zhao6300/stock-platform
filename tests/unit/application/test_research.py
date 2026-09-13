@@ -5,8 +5,8 @@ from types import MappingProxyType
 from uuid import UUID
 
 from stock_platform.application.research import ResearchRequest
-from stock_platform.application.research_runner import ResearchRunner
-from stock_platform.domain.common import Success
+from stock_platform.application.research_runner import ResearchRunner, ResearchRunOutcome
+from stock_platform.domain.common import Failure, Result, Success
 from stock_platform.domain.research import DataSnapshotManifest, ResearchDateRange, ResearchManifest
 
 
@@ -58,25 +58,52 @@ def _repositories() -> MappingProxyType:
 
 
 class _ResearchRunResult:
+    def __init__(self, saved: Result[None, str]) -> None:
+        self._saved = saved
+        self.ran = False
+
+    def save(self, manifest: ResearchManifest) -> Result[None, str]:
+        """Pretend to save the manifest and return an explicit result."""
+        return self._saved
+
     def run(self, manifest: ResearchManifest) -> Success:
         """Return a success result for the given manifest."""
-        return Success(
-            {
-                "result": "CREATED",
-                "manifest": manifest,
-            }
-        )
+        self.ran = True
+        return Success(ResearchRunOutcome(manifest=manifest, result="CREATED"))
 
 
-def test_apply_replay_uses_snapshot_snapshot_and_publishes_manifest() -> None:
+def test_apply_replay_saves_before_running() -> None:
     runner = ResearchRunner(_repositories())
     manifest = _manifest()
     snapshot = _snapshot()
-    result = runner.apply_replay(_ResearchRunResult(), manifest, snapshot)
+    result = runner.apply_replay(_ResearchRunResult(saved=Success(None)), manifest, snapshot)
 
     assert result is not None
-    assert result.value["manifest"] == manifest
-    assert result.value["result"] == "CREATED"
+    assert result.value.manifest == manifest
+    assert result.value.result == "CREATED"
+
+
+def test_apply_replay_avoids_running_when_save_fails() -> None:
+    runner = ResearchRunner(_repositories())
+    manifest = _manifest()
+    fake_runner = _ResearchRunResult(saved=Failure("save failed"))
+
+    result = runner.apply_replay(fake_runner, manifest, _snapshot())
+
+    assert fake_runner.ran is False
+    assert result is not None
+    assert result.error.missing[0].kind == "manifest"
+
+
+def test_apply_replay_publishes_manifest_when_saved() -> None:
+    runner = ResearchRunner(_repositories())
+    manifest = _manifest()
+    snapshot = _snapshot()
+    result = runner.apply_replay(_ResearchRunResult(saved=Success(None)), manifest, snapshot)
+
+    assert result is not None
+    assert result.value.manifest == manifest
+    assert result.value.result == "CREATED"
 
 
 def test_research_id_is_canonical() -> None:
