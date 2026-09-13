@@ -107,7 +107,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** UTC boundaries, DST, and effective edges map to the uniquely applicable local date; run the file with pytest.
     - **Property 23: Observation dates follow the uniquely applicable timezone.**
     - **Validates: Requirements 6.3, 6.4**
-  - [ ] 3.11 Write Property 24 test for atomic calendar-interpretation rejection
+  - [x] 3.11 Write Property 24 test for atomic calendar-interpretation rejection
     - **Affected modules:** `tests/property/test_property_24_calendar_rejection.py`.
     - **Prerequisites:** 3.8, 1.2.
     - **Expected output / verify:** Zero/multiple versions identify condition and preserve dataset model state; run the file with pytest.
