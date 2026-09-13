@@ -20,13 +20,16 @@ from stock_platform.domain.common import SeriesPoint
                 allow_nan=False,
             ),
         ),
-        min_size=4,
+        min_size=1,
         max_size=40,
-    )
+    ),
 )
 def test_drawdown_follows_the_running_maximum(values: list[Decimal | None]) -> None:
     assume(any(value is not None for value in values))
-    points = [SeriesPoint(date(2025, 1, index + 1), value) for index, value in enumerate(values)]
+    points = [
+        SeriesPoint(date(2025, 1, (index % 31) + 1), value)
+        for index, value in enumerate(values)
+    ]
     result = drawdown(points)
 
     running: Decimal | None = None
