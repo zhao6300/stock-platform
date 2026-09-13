@@ -58,6 +58,7 @@ src = ["src", "tests"]
 select = ["B", "C4", "E4", "E7", "E9", "F", "I", "PLR", "PLW", "RUF", "SIM", "T20", "UP"]
 [tool.ruff.lint.per-file-ignores]
 "src/stock_platform/domain/common.py" = ["PLR0911", "PLR0912"]
+"src/stock_platform/domain/adjustments.py" = ["PLR0911", "PLR0912"]
 "src/stock_platform/application/ingestion.py" = ["PLR0912", "PLR0915"]
 
 [tool.ruff.lint.isort]

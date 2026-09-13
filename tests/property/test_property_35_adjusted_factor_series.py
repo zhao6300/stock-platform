@@ -6,6 +6,7 @@ from decimal import Decimal
 from stock_platform.domain.adjustments import (
     AdjustmentFactorPoint,
     AdjustmentFactorSeries,
+    AdjustmentFactorSource,
     AdjustmentMode,
     AdjustmentService,
     PricePoint,
@@ -19,7 +20,7 @@ def _factor_series(
 ) -> AdjustmentFactorSeries:
     return AdjustmentFactorSeries(
         version_id="factors-v1",
-        source_type=None,
+        source_type=AdjustmentFactorSource.PROVIDER,
         source_id="provider-1",
         retrieved_at=datetime(2025, 12, 31, tzinfo=UTC),
         points=tuple(

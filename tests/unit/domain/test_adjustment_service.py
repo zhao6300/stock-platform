@@ -28,14 +28,14 @@ def _factor_series(
         source_id=source_id,
         retrieved_at=datetime(2025, 12, 1, tzinfo=UTC),
         points=points,
-    )
+)
 
 
 def test_adjustment_factor_preserves_raw_value() -> None:
     raw = (PricePoint(date(2025, 1, 1), Decimal("10")),)
     factors = _factor_series(
         points=(AdjustmentFactorPoint(date(2025, 1, 1), Decimal(2)),),
-        source_type=1,
+        source_type=AdjustmentFactorSource.PROVIDER,
     )
 
     adjusted = AdjustmentService().apply(

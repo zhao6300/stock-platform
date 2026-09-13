@@ -81,6 +81,8 @@ class AdjustmentFactorSeries:
 
     def __post_init__(self) -> None:
         ensure_timezone_aware(self.retrieved_at)
+        if not isinstance(self.source_type, AdjustmentFactorSource):
+            raise ValueError("adjustment factor source type is missing")
         if not self.version_id or not self.source_id:
             raise ValueError("adjustment factors must have a source and version")
 
@@ -205,9 +207,12 @@ class AdjustmentService:
                 )
             )
 
-        if not factors.points:
+        try:
+            sorted_factors = _factor_points(factors.points)
+        except AdjustmentValidationError:
             return Failure(InvalidFactor(factors.version_id))
-        sorted_factors = _factor_points(factors.points)
+        if not sorted_factors:
+            return Failure(InvalidFactor(factors.version_id))
         factor_by_date = {point.effective_date: point.factor for point in sorted_factors}
         invalid_dates = tuple(
             factor.effective_date

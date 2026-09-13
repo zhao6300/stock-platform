@@ -24,8 +24,16 @@ class ProviderUnavailable(Exception):
     endpoint_id: str
     correlation_id: str | None = None
 
+    @property
+    def category(self) -> str:
+        return "PROVIDER_UNAVAILABLE"
+
 
 @dataclass(frozen=True, slots=True)
 class EnvelopeValidationError(Exception):
     provider: str
     fields: tuple[str, ...]
+
+    @property
+    def category(self) -> str:
+        return "VALIDATION"
