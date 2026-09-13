@@ -53,3 +53,14 @@ class ResearchRunner:
         if missing:
             return Failure(ReplayOutcome(None, missing))
         return Success(ReplayOutcome("READY", ()))
+
+    def run(
+        self,
+        runner: ResearchManifestRepository,
+        manifest: ResearchManifest,
+    ) -> Result[ResearchRunOutcome, str]:
+        """Commit the manifest, then publish exactly one derived result."""
+        saved = runner.save(manifest)
+        if not isinstance(saved, Success):
+            return Failure(saved.error)
+        return Success(ResearchRunOutcome(manifest, "CREATED"))
