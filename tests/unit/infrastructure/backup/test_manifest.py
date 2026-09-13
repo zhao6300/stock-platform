@@ -4,6 +4,10 @@ from hashlib import sha256
 from pathlib import Path
 
 from stock_platform.domain.common import Failure, Success
+from stock_platform.infrastructure.backup.backup import (
+    BackupPlatformState,
+    default_backup_manifest,
+)
 from stock_platform.infrastructure.backup.manifest import (
     BackupManifest,
     DatasetManifest,
@@ -80,3 +84,36 @@ def test_restore_eligible_reports_incompatibility_before_artifact_read(
 
     assert isinstance(result, Failure)
     assert result.error.expected_schema == dataset.schema_id
+
+
+def test_default_backup_manifest_omits_plaintext_credentials() -> None:
+    state = BackupPlatformState(
+        schema_id="schema-v1",
+        configuration=("config-v1",),
+        security_master_versions=("master-v1",),
+        security_mappings=("mapping-v1",),
+        calendars=("calendar-v1",),
+        retained_data=("bars-v1",),
+        quality_reports=("quality-v1",),
+        snapshot_ids=("snapshot-1",),
+        manifests=("manifest-1",),
+        research_results=("result-1",),
+        credentials=("secret-token",),
+    )
+
+    manifest = default_backup_manifest(state)
+
+    dataset_names = tuple(dataset.name for dataset in manifest.datasets)
+    assert set(dataset_names) == {
+        "configuration",
+        "security_master_versions",
+        "security_mappings",
+        "calendars",
+        "retained_data",
+        "quality_reports",
+        "snapshot_ids",
+        "manifests",
+        "research_results",
+    }
+    assert not any(dataset.name == "credentials" for dataset in manifest.datasets)
+    assert not any("secret-token" in dataset.name for dataset in manifest.datasets)
