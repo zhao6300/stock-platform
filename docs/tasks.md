@@ -90,18 +90,18 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Stateful name/status/mapping changes append versions and retain required master fields; run the file with pytest.
     - **Property 21: Security Master changes preserve complete history.**
     - **Validates: Requirements 5.7, 5.8**
-  - [ ] 3.8 Implement versioned trading/valuation calendars and timestamp interpretation
+  - [x] 3.8 Implement versioned trading/valuation calendars and timestamp interpretation
     - **Affected modules:** `src/stock_platform/domain/calendars.py`, `tests/unit/domain/test_calendars.py`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Non-overlapping effective versions, IANA timezone conversion, open/expected dates, and missing/ambiguous errors; run `python -m pytest tests/unit/domain/test_calendars.py -q`.
     - _Requirements: 6.1-6.5_
-  - [ ] 3.9 Write Property 22 test for valid non-overlapping calendar versions
+  - [x] 3.9 Write Property 22 test for valid non-overlapping calendar versions
     - **Affected modules:** `tests/property/test_property_22_calendar_versions.py`.
     - **Prerequisites:** 3.8, 1.2.
     - **Expected output / verify:** Generated intervals/types/markets prove registration constraints; run the file with pytest.
     - **Property 22: Calendar version sets are valid and non-overlapping.**
     - **Validates: Requirements 6.1, 6.2**
-  - [ ] 3.10 Write Property 23 test for timezone-based observation dates
+  - [x] 3.10 Write Property 23 test for timezone-based observation dates
     - **Affected modules:** `tests/property/test_property_23_calendar_timezone_mapping.py`.
     - **Prerequisites:** 3.8, 1.2.
     - **Expected output / verify:** UTC boundaries, DST, and effective edges map to the uniquely applicable local date; run the file with pytest.
@@ -113,7 +113,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Zero/multiple versions identify condition and preserve dataset model state; run the file with pytest.
     - **Property 24: Non-unique calendar interpretation is rejected atomically.**
     - **Validates: Requirements 6.5**
-  - [ ] 3.12 Implement precedence-defined missing-observation classification
+  - [x] 3.12 Implement precedence-defined missing-observation classification
     - **Affected modules:** `src/stock_platform/domain/calendars.py`, `tests/unit/domain/test_gap_classification.py`.
     - **Prerequisites:** 3.8.
     - **Expected output / verify:** Every absent expected date receives exactly one retained reason code by the specified precedence; run the focused test file.
