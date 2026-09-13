@@ -1,9 +1,18 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime
+from typing import Any
 from uuid import UUID
 
-from stock_platform.domain.research import ResearchDateRange, ResearchManifest, manifest_diff
+import hypothesis.strategies as st
+from hypothesis import given
+
+from stock_platform.domain.research import (
+    ResearchDateRange,
+    ResearchManifest,
+    manifest_diff,
+    replay_differences,
+)
 
 
 def _manifest(
@@ -57,3 +66,17 @@ def test_manifest_diff_reports_same_fields_unchanged() -> None:
     differences = manifest_diff(manifest, manifest)
 
     assert differences == ()
+
+
+@given(
+    original=st.dictionaries(
+        st.text(min_size=1, max_size=8),
+        st.one_of(st.booleans(), st.integers(), st.decimals(allow_nan=False)),
+    ),
+)
+def test_replay_differences_reconcile_every_exact_and_numeric_value(
+    original: dict[str, Any],
+) -> None:
+    replayed = dict(original)
+
+    assert replay_differences(replayed, original) == ()
