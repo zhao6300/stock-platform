@@ -118,7 +118,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 3.8.
     - **Expected output / verify:** Every absent expected date receives exactly one retained reason code by the specified precedence; run the focused test file.
     - _Requirements: 6.6-6.9, 9.12_
-  - [ ] 3.13 Write Property 25 test for exactly one missing-observation reason
+  - [x] 3.13 Write Property 25 test for exactly one missing-observation reason
     - **Affected modules:** `tests/property/test_property_25_missing_reason.py`.
     - **Prerequisites:** 3.12, 1.2.
     - **Expected output / verify:** Generated calendar/tradability/NAV states prove exhaustive exclusive classification; run the file with pytest.
