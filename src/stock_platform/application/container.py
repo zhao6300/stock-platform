@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -32,6 +33,9 @@ class ApplicationContainer:
     compatible_schemas: tuple[str, ...] = ()
     storage: str | None = None
     latest_ingestion: str = "NO_SUCCESSFUL_INGESTION"
+    catalog: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]] = field(
+        default_factory=dict
+    )
     observations: dict[str, Any] = field(default_factory=dict)
 
     def status(self) -> StatusDiagnostics:

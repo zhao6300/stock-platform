@@ -6,6 +6,23 @@ from fastapi.testclient import TestClient
 from stock_platform.web.main import app
 
 
+def test_web_research_query_posts_to_application_use_case() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/v1/research/query",
+        json={
+            "entity": "daily_bar",
+            "snapshot_id": "snapshot-1",
+            "sort_field": "close",
+            "filters": [{"field": "close", "value": "10"}],
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["applied_filter_count"] == 1
+
+
 def test_web_status_is_enabled_and_no_trading_surfaces_absent() -> None:
     client = TestClient(app)
     response = client.get("/api/v1/status")
