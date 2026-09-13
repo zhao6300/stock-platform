@@ -22,6 +22,7 @@ class ErrorCode(StrEnum):
     CONFLICT = "CONFLICT"
     PROVIDER_RATE_LIMITED = "PROVIDER_RATE_LIMITED"
     PROVIDER_UNAVAILABLE = "PROVIDER_UNAVAILABLE"
+    CREDENTIAL_UNAVAILABLE = "CREDENTIAL_UNAVAILABLE"
     INTERNAL = "INTERNAL"
 
 
@@ -73,3 +74,18 @@ class ApplicationError(Exception):
     def __init__(self, envelope: ErrorEnvelope) -> None:
         self.envelope = envelope
         super().__init__(envelope.message)
+
+
+class CredentialUnavailableError(ApplicationError):
+    """Used when Keychain cannot provide the requested credential."""
+
+
+def credential_unavailable(provider: str, reference: str) -> ApplicationError:
+    """Return a stable provider/context error without credential material."""
+    return ApplicationError(
+        ErrorEnvelope.build(
+            code=ErrorCode.CREDENTIAL_UNAVAILABLE,
+            message="credential unavailable for provider",
+            context={"provider": provider, "credential_reference": reference},
+        )
+    )
