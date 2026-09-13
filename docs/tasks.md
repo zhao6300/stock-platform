@@ -656,7 +656,7 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 5.4, 6.11, 12.1.
     - **Expected output / verify:** Write-lock/SQLite snapshot/referenced-object copy, exact required inventory, secret-free default, per-dataset counts/checksums, independent reread, and restorable only after all pass; run focused tests.
     - _Requirements: 13.9-13.10, 14.3, 14.9_
-  - [ ] 13.2 Write Property 63 test for complete secret-free default backup inventory
+  - [x] 13.2 Write Property 63 test for complete secret-free default backup inventory
     - **Affected modules:** `tests/property/test_property_63_backup_inventory.py`.
     - **Prerequisites:** 13.1, 1.2.
     - **Expected output / verify:** Generated platform states include exactly required permitted references and no plaintext credentials; run the file with pytest.
