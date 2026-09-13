@@ -44,6 +44,7 @@ class QueryResult(DTO):
     entity: str
     query_parameters: str
     applied_filter_count: int
+    returned_count: int
     rows: tuple[tuple[tuple[str, object], ...], ...]
     has_more: bool
 
@@ -89,6 +90,7 @@ def execute_research_query(
                 }
             ),
             applied_filter_count=len(query.filters),
+            returned_count=len(selected),
             rows=tuple(
                 tuple(
                     (field_name, canonical_value(row[field_name]))

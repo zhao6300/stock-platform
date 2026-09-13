@@ -33,6 +33,7 @@ def test_query_limits_and_metadata_are_exact(filter_count: int, row_count: int) 
         assert result.error.permitted_maximum == MAXIMUM_FILTER_COUNT
         return
     assert result.value.applied_filter_count == filter_count
+    assert result.value.returned_count == min(row_count, MAXIMUM_ROW_COUNT)
     assert len(result.value.rows) == min(row_count, MAXIMUM_ROW_COUNT)
     assert result.value.has_more == (row_count > MAXIMUM_ROW_COUNT)
 
