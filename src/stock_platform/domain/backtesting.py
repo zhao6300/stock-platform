@@ -251,6 +251,8 @@ class BacktestEngine:
     initial_cash: Decimal
     initial_positions: Mapping[str, Decimal]
     point_in_time_membership: Mapping[date, frozenset[str]] | None = None
+    adjustment_mode: str = "UNADJUSTED"
+    benchmark: str = "NONE"
     entries: list[TradeRecord] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -384,9 +386,9 @@ class BacktestEngine:
             data_start=dates[0],
             data_end=dates[-1],
             universe=self._universe(),
-            benchmark="NONE",
+            benchmark=self.benchmark,
             calendar_version=self.calendar.version_id,
-            adjustment_mode="Es",
+            adjustment_mode=self.adjustment_mode,
             cost_model=self.cost_model,
             missing_price_policy=self.missing_price_policy,
         )
@@ -421,9 +423,9 @@ class BacktestEngine:
             data_start=dates[0],
             data_end=dates[-1],
             universe=self._universe(),
-            benchmark="NONE",
+            benchmark=self.benchmark,
             calendar_version=self.calendar.version_id,
-            adjustment_mode="NONE",
+            adjustment_mode="UNADJUSTED",
             cost_model=self.cost_model,
             missing_price_policy=self.missing_price_policy,
         )

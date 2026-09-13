@@ -9,17 +9,17 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
 ## Tasks
 
 - [ ] 1. Scaffold the Python repository and freeze foundational interfaces
-  - [ ] 1.1 Create the Python 3.12 package, dependency, and tool configuration
+  - [x] 1.1 Create the Python 3.12 package, dependency, and tool configuration
     - **Affected modules:** `pyproject.toml`, lockfile, `src/stock_platform/__init__.py`, package directories from the design, `.gitignore`.
     - **Prerequisites:** None.
     - **Expected output / verify:** Installable `src` package with exact locked runtime/test dependencies and empty importable module boundaries; run `python -m pip install -e '.[test]'` and `python -c "import stock_platform"`.
     - _Requirements: 1.1, 1.3, 14.1_
-  - [ ] 1.2 Establish deterministic test infrastructure and architecture checks
+  - [x] 1.2 Establish deterministic test infrastructure and architecture checks
     - **Affected modules:** `tests/conftest.py`, `tests/strategies/`, `tests/architecture/`, pytest/Hypothesis configuration.
     - **Prerequisites:** 1.1.
     - **Expected output / verify:** Shared Decimal/date/timezone/state strategies, fake clock/transport/keyring fixtures, temporary SQLite/object-store fixtures, minimum 100 Hypothesis examples, and dependency-direction test; run `python -m pytest tests/architecture -q`.
     - _Requirements: 1.1-1.5, 11.6-11.7, 13.1-13.3_
-  - [ ] 1.3 Add shared result, error, identifier, time, Decimal, and immutable DTO primitives
+  - [x] 1.3 Add shared result, error, identifier, time, Decimal, and immutable DTO primitives
     - **Affected modules:** `src/stock_platform/domain/common.py`, `src/stock_platform/application/dto.py`, `src/stock_platform/application/errors.py`.
     - **Prerequisites:** 1.1.
     - **Expected output / verify:** Frozen typed values and stable error envelope with redaction-safe context, timezone-aware timestamps, canonical JSON helpers, and no infrastructure imports; run `python -m pytest tests/unit/domain/test_common.py -q`.
@@ -285,13 +285,13 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 3.1, 3.8, 6.5.
     - **Expected output / verify:** Decimal parsing, required-field aggregation, calendar/numeric/OHLC/NAV atomic validation, and typed accepted/rejected candidates; run focused unit tests.
     - _Requirements: 2.2-2.4, 2.6, 7.7, 9.2-9.7_
-  - [ ] 7.2 Write Property 5 test for Daily Bar acceptance equivalence
+  - [x] 7.2 Write Property 5 test for Daily Bar acceptance equivalence
     - **Affected modules:** `tests/property/test_property_05_daily_bar_acceptance.py`.
     - **Prerequisites:** 7.1, 1.2.
     - **Expected output / verify:** Generated bars/calendars prove iff acceptance, all failures reported, prior facts unchanged; run the file with pytest.
     - **Property 5: Daily Bar acceptance is equivalent to all canonical constraints.**
     - **Validates: Requirements 2.2, 2.6, 7.7, 9.2-9.7**
-  - [ ] 7.3 Write Property 6 test for Fund NAV acceptance equivalence
+  - [x] 7.3 Write Property 6 test for Fund NAV acceptance equivalence
     - **Affected modules:** `tests/property/test_property_06_fund_nav_acceptance.py`.
     - **Prerequisites:** 7.1, 1.2.
     - **Expected output / verify:** Generated NAV rows/calendars prove iff acceptance and cumulative NAV rules; run the file with pytest.
@@ -313,59 +313,59 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Prerequisites:** 3.8, 4.1, 6.3.
     - **Expected output / verify:** Maximal expected-minus-existing segments, full refresh dates, boundary validation before network, compliance/credential/space checks; run focused tests.
     - _Requirements: 7.1, 7.8-7.9, 14.6_
-  - [ ] 7.7 Write Property 26 test for maximal missing ingestion segments
+  - [x] 7.7 Write Property 26 test for maximal missing ingestion segments
     - **Affected modules:** `tests/property/test_property_26_missing_segments.py`.
     - **Prerequisites:** 7.6, 1.2.
     - **Expected output / verify:** Generated expected/existing dates expand exactly and cannot be merged further; run the file with pytest.
     - **Property 26: Non-refresh ingestion requests maximal missing segments.**
     - **Validates: Requirements 7.1**
-  - [ ] 7.8 Write Property 29 test for refresh planning
+  - [x] 7.8 Write Property 29 test for refresh planning
     - **Affected modules:** `tests/property/test_property_29_refresh_planning.py`.
     - **Prerequisites:** 7.6, 1.2.
     - **Expected output / verify:** Refresh always returns all expected dates regardless of stored observations; run the file with pytest.
     - **Property 29: Refresh planning ignores existing observations.**
     - **Validates: Requirements 7.8**
-  - [ ] 7.9 Write Property 30 test for pre-network invalid-range failure
+  - [x] 7.9 Write Property 30 test for pre-network invalid-range failure
     - **Affected modules:** `tests/property/test_property_30_invalid_ranges.py`.
     - **Prerequisites:** 7.6, 1.2.
     - **Expected output / verify:** Omitted/malformed/inverted ranges cause zero calls and preserve dataset; run the file with pytest.
     - **Property 30: Invalid ranges fail before network access.**
     - **Validates: Requirements 7.9**
-  - [ ] 7.10 Implement logical observation comparison and linear version decisions
+  - [x] 7.10 Implement logical observation comparison and linear version decisions
     - **Affected modules:** `src/stock_platform/domain/ingestion.py`, `tests/unit/domain/test_observation_versioning.py`.
     - **Prerequisites:** 7.1.
     - **Expected output / verify:** Canonical value hash excludes retrieval time; equal values reuse IDs and changed values point to immediate predecessor; run focused tests.
     - _Requirements: 7.2-7.3_
-  - [ ] 7.11 Write Property 27 test for idempotent linear observation versioning
+  - [x] 7.11 Write Property 27 test for idempotent linear observation versioning
     - **Affected modules:** `tests/property/test_property_27_observation_versioning.py`.
     - **Prerequisites:** 7.10, 1.2.
     - **Expected output / verify:** Stateful generated observation sequences prove reuse/one-version append/history retention; run the file with pytest.
     - **Property 27: Observation versioning is idempotent and linear.**
     - **Validates: Requirements 7.2, 7.3**
-  - [ ] 7.12 Implement versioned Data Quality rules, assessments, issues, and reports
+  - [x] 7.12 Implement versioned Data Quality rules, assessments, issues, and reports
     - **Affected modules:** `src/stock_platform/domain/quality.py`, `tests/unit/domain/test_quality.py`.
     - **Prerequisites:** 7.1, 3.12.
     - **Expected output / verify:** Uniqueness/required/OHLC/value/calendar rules, complete evidence, missing dependencies, severity max, report aggregation, and quality re-evaluation; run focused tests.
     - _Requirements: 9.1-9.10, 9.13_
-  - [ ] 7.13 Write Property 8 test for unique current canonical observations
+  - [x] 7.13 Write Property 8 test for unique current canonical observations
     - **Affected modules:** `tests/property/test_property_08_observation_uniqueness.py`.
     - **Prerequisites:** 7.10, 7.12, 1.2.
     - **Expected output / verify:** Arbitrary publication sequences retain one current logical key and flag duplicates; run the file with pytest.
     - **Property 8: Current canonical observations are unique.**
     - **Validates: Requirements 2.8, 9.1**
-  - [ ] 7.14 Write Property 38 test for complete quality evidence
+  - [x] 7.14 Write Property 38 test for complete quality evidence
     - **Affected modules:** `tests/property/test_property_38_quality_evidence.py`.
     - **Prerequisites:** 7.12, 1.2.
     - **Expected output / verify:** Every generated failed rule records all mandatory evidence; run the file with pytest.
     - **Property 38: Quality issues contain complete evidence.**
     - **Validates: Requirements 9.8**
-  - [ ] 7.15 Write Property 39 test for maximum quality severity
+  - [x] 7.15 Write Property 39 test for maximum quality severity
     - **Affected modules:** `tests/property/test_property_39_quality_severity.py`.
     - **Prerequisites:** 7.12, 1.2.
     - **Expected output / verify:** Generated rule outcomes/dependency failures select exact version-defined maximum and name missing inputs; run the file with pytest.
     - **Property 39: Quality severity is the maximum applicable severity.**
     - **Validates: Requirements 9.9, 9.10**
-  - [ ] 7.16 Write Property 40 test for complete quality-report aggregation
+  - [x] 7.16 Write Property 40 test for complete quality-report aggregation
     - **Affected modules:** `tests/property/test_property_40_quality_report.py`.
     - **Prerequisites:** 7.12, 1.2.
     - **Expected output / verify:** Generated checks aggregate exactly scope/version/issues/status/time; run the file with pytest.
@@ -401,53 +401,53 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - _Requirements: 2.2-2.8, 4.1, 4.4, 7.1-7.10, 9.1-9.13, 14.6_
 
 - [ ] 8. Implement price adjustment and fund NAV presentation semantics
-  - [ ] 8.1 Implement versioned factors and Adjustment Service
+  - [x] 8.1 Implement versioned factors and Adjustment Service
     - **Affected modules:** `src/stock_platform/domain/adjustments.py`, unit tests.
     - **Prerequisites:** 7.10, 7.12.
     - **Expected output / verify:** Immutable raw prices, required mode, identity/unified factor formulas, fixed full-series anchors, positive complete factors, source/version metadata, and all-or-nothing adjusted series; run focused tests.
     - _Requirements: 8.1-8.9_
-  - [ ] 8.2 Write Property 32 test for raw-price immutability
+  - [x] 8.2 Write Property 32 test for raw-price immutability
     - **Affected modules:** `tests/property/test_property_32_raw_price_immutability.py`.
     - **Prerequisites:** 8.1, 1.2.
     - **Expected output / verify:** Generated modes/factor updates never alter raw values; run the file with pytest.
     - **Property 32: Raw prices are immutable under adjustment operations.**
     - **Validates: Requirements 8.1**
-  - [ ] 8.3 Write Property 33 test for exactly one valid adjustment mode
+  - [x] 8.3 Write Property 33 test for exactly one valid adjustment mode
     - **Affected modules:** `tests/property/test_property_33_adjustment_mode.py`.
     - **Prerequisites:** 8.1, 1.2.
     - **Expected output / verify:** Missing/multiple/invalid modes return no series and list all valid modes; run the file with pytest.
     - **Property 33: Price requests require exactly one valid adjustment mode.**
     - **Validates: Requirements 8.2, 8.3**
-  - [ ] 8.4 Write Property 34 test for unadjusted identity
+  - [x] 8.4 Write Property 34 test for unadjusted identity
     - **Affected modules:** `tests/property/test_property_34_unadjusted_identity.py`.
     - **Prerequisites:** 8.1, 1.2.
     - **Expected output / verify:** Arbitrary raw series preserve values and ordering; run the file with pytest.
     - **Property 34: Unadjusted prices are an identity transformation.**
     - **Validates: Requirements 8.4**
-  - [ ] 8.5 Write Property 35 test for one complete positive factor version
+  - [x] 8.5 Write Property 35 test for one complete positive factor version
     - **Affected modules:** `tests/property/test_property_35_adjusted_factor_series.py`.
     - **Prerequisites:** 8.1, 1.2.
     - **Expected output / verify:** Generated complete factors match anchor oracle; missing/nonpositive factors reject entire output and quality; run the file with pytest.
     - **Property 35: Adjusted prices use one complete positive factor version.**
     - **Validates: Requirements 8.5, 8.7, 8.8**
-  - [ ] 8.6 Write Property 36 test for exclusive complete factor provenance
+  - [x] 8.6 Write Property 36 test for exclusive complete factor provenance
     - **Affected modules:** `tests/property/test_property_36_factor_provenance.py`.
     - **Prerequisites:** 8.1, 1.2.
     - **Expected output / verify:** Factors require exactly one provider/corporate-action source plus date/time/version; run the file with pytest.
     - **Property 36: Adjustment factor provenance is exclusive and complete.**
     - **Validates: Requirements 8.6**
-  - [ ] 8.7 Implement provider-only open-end-fund cumulative NAV response
+  - [x] 8.7 Implement provider-only open-end-fund cumulative NAV response
     - **Affected modules:** `src/stock_platform/domain/adjustments.py`, `tests/unit/domain/test_fund_nav_response.py`.
     - **Prerequisites:** 7.1.
     - **Expected output / verify:** Provider cumulative NAV is never synthesized; absence returns unchanged unit NAV plus explicit unavailable status; run `python -m pytest tests/unit/domain/test_fund_nav_response.py -q`.
     - _Requirements: 8.10-8.11_
-  - [ ] 8.8 Write Property 37 test for provider-only cumulative NAV with explicit fallback
+  - [x] 8.8 Write Property 37 test for provider-only cumulative NAV with explicit fallback
     - **Affected modules:** `tests/property/test_property_37_fund_nav_fallback.py`.
     - **Prerequisites:** 8.7, 1.2.
     - **Expected output / verify:** Generated NAV observations return cumulative NAV iff provider-supplied and otherwise preserve unit NAV plus unavailable status; run the file with pytest.
     - **Property 37: Open-end fund cumulative NAV is provider-only with explicit fallback.**
     - **Validates: Requirements 8.10, 8.11**
-  - [ ] 8.9 Validate adjustment labels, subrange consistency, and rejected-factor integration
+  - [x] 8.9 Validate adjustment labels, subrange consistency, and rejected-factor integration
     - **Affected modules:** `tests/integration/adjustments/test_adjustment_service.py`.
     - **Prerequisites:** 8.2-8.8.
     - **Expected output / verify:** Persisted/query results disclose mode/source/version, subrange equals full-series slice, and invalid factors return no values; run focused integration tests.
@@ -577,46 +577,46 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Every nonempty unsupported subset returns all capabilities, zero trades, and unchanged initial ledger; run the file with pytest.
     - **Property 59: Unsupported strategy requests execute nothing.**
     - **Validates: Requirements 12.16**
-  - [ ] 11.4 Implement Decimal Cost Model, execution simulator, and long-only ledger
+  - [x] 11.4 Implement Decimal Cost Model, execution simulator, and long-only ledger
     - **Affected modules:** `src/stock_platform/domain/backtest.py`, `execution.py`, `ledger.py`, unit tests.
     - **Prerequisites:** 11.1.
     - **Expected output / verify:** Stable execution order, slippage/gross/commission/tax/total/net cash records, currency rounding, tradability-first zero fills, cash/holding constraints; run focused tests.
     - _Requirements: 12.1, 12.5-12.8_
-  - [ ] 11.5 Write Property 53 test for solvent long-only ledgers
+  - [x] 11.5 Write Property 53 test for solvent long-only ledgers
     - **Affected modules:** `tests/property/test_property_53_ledger_solvent.py`.
     - **Prerequisites:** 11.4, 1.2.
     - **Expected output / verify:** Stateful generated events preserve non-negative cash and every position after each step; run the file with pytest.
     - **Property 53: Backtest ledgers remain long-only and solvent.**
     - **Validates: Requirements 12.1**
-  - [ ] 11.6 Write Property 55 test for filled-trade/cost/ledger reconciliation
+  - [x] 11.6 Write Property 55 test for filled-trade/cost/ledger reconciliation
     - **Affected modules:** `tests/property/test_property_55_trade_reconciliation.py`.
     - **Prerequisites:** 11.4, 1.2.
     - **Expected output / verify:** Generated fills recompute every component and exact ledger delta under pinned rounding; run the file with pytest.
     - **Property 55: Filled-trade records reconcile with the cost model and ledger.**
     - **Validates: Requirements 12.5, 12.6**
-  - [ ] 11.7 Write Property 56 test for atomic blocked zero fills
+  - [x] 11.7 Write Property 56 test for atomic blocked zero fills
     - **Affected modules:** `tests/property/test_property_56_blocked_trades.py`.
     - **Prerequisites:** 11.4, 1.2.
     - **Expected output / verify:** Generated tradability/insufficient-cash requests record exact reason with no ledger mutation; run the file with pytest.
     - **Property 56: Blocked trades are zero-fill atomic operations.**
     - **Validates: Requirements 12.7, 12.8**
-  - [ ] 11.8 Implement valuation with exactly two missing-price policies
+  - [x] 11.8 Implement valuation with exactly two missing-price policies
     - **Affected modules:** `src/stock_platform/domain/valuation.py`, unit tests.
     - **Prerequisites:** 11.4, 3.8.
     - **Expected output / verify:** Unavailable and prior-valid-close-within-five-open-sessions policies produce complete audit records and dependent availability; run focused tests.
     - _Requirements: 12.9-12.10_
-  - [ ] 11.9 Write Property 57 test for exhaustive bounded missing-price policies
+  - [x] 11.9 Write Property 57 test for exhaustive bounded missing-price policies
     - **Affected modules:** `tests/property/test_property_57_missing_price.py`.
     - **Prerequisites:** 11.8, 1.2.
     - **Expected output / verify:** Generated calendars/history prove exact 0/1/5/6-session boundary and audit fields; run the file with pytest.
     - **Property 57: Missing-price policies are exhaustive and bounded.**
     - **Validates: Requirements 12.9, 12.10**
-  - [ ] 11.10 Implement Backtest Runner and four-section report builder
+  - [x] 11.10 Implement Backtest Runner and four-section report builder
     - **Affected modules:** `src/stock_platform/application/backtests.py`, `src/stock_platform/domain/backtest_report.py`, integration tests.
     - **Prerequisites:** 11.4, 11.8, 10.3.
     - **Expected output / verify:** Deterministic daily loop, manifest-linked report, required four sections/disclosures, quality list, survivorship warning, benchmark, and research-estimate disclaimer; run focused tests.
     - _Requirements: 1.7, 12.11-12.15_
-  - [ ] 11.11 Write Property 58 test for exact backtest disclosures
+  - [x] 11.11 Write Property 58 test for exact backtest disclosures
     - **Affected modules:** `tests/property/test_property_58_backtest_disclosures.py`.
     - **Prerequisites:** 11.10, 1.2.
     - **Expected output / verify:** Generated run inputs/universe history/quality usages exactly match report disclosures and warnings; run the file with pytest.

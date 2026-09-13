@@ -49,6 +49,10 @@ minversion = "9.0"
 addopts = "-ra --strict-markers --strict-config"
 testpaths = ["tests"]
 filterwarnings = ["error"]
+markers = [
+  "property: marks properties",
+  "requirement_traceability: marks requirement traceability checks",
+]
 
 [tool.ruff]
 line-length = 100
