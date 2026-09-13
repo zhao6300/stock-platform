@@ -32,6 +32,32 @@ class ObservationGapReasonDetailed(StrEnum):
     NOT_CONNECTED = "NOT_CONNECTED"
 
 
+class ObservationGapClassification(StrEnum):
+    """The one precedence-defined reason used for reporting a missing date."""
+
+    EXPECTED_CALENDAR_GAP = "EXPECTED_CALENDAR_GAP"
+    SUSPENDED_TRADING_GAP = "SUSPENDED_TRADING_GAP"
+    UNRESOLVED_GAP = "UNRESOLVED_GAP"
+    DELAYED_OR_MISSING_VALUATION = "DELAYED_OR_MISSING_VALUATION"
+
+
+def classify_observation_gap(
+    trading_calendar_open: bool,
+    tradability_status: str | None,
+    valuation_expected: bool,
+) -> ObservationGapClassification:
+    """Apply the precedence order from the calendar gap specification."""
+    if not trading_calendar_open:
+        return ObservationGapClassification.EXPECTED_CALENDAR_GAP
+    if tradability_status == "SUSPENDED":
+        return ObservationGapClassification.SUSPENDED_TRADING_GAP
+    if tradability_status is None or tradability_status == "UNKNOWN":
+        return ObservationGapClassification.UNRESOLVED_GAP
+    if valuation_expected:
+        return ObservationGapClassification.DELAYED_OR_MISSING_VALUATION
+    return ObservationGapClassification.UNRESOLVED_GAP
+
+
 class ObservationGapReasonObservation(StrEnum):
     """A specific observation key that is missing from the current gap context."""
 

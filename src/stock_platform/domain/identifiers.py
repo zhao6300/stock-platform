@@ -110,12 +110,7 @@ class IdentityRegistry:
             currency=version.currency,
             termination_date=version.termination_date,
         )
-        self._ensure_no_overlap(
-            self._identities.setdefault(canonical, []),
-            derived.identity.valid_from,
-            derived.identity.valid_to,
-        )
-        self._identities[canonical].append(derived)
+        self._identities.setdefault(canonical, []).append(derived)
 
     def register_mapping(self, mapping: IdentifierMapping) -> None:
         mapping_id = mapping.mapping_id
@@ -174,11 +169,30 @@ class IdentityRegistry:
         version_from = valid_from
         version_to = valid_to if valid_to is not None else date.max
         for history in versions:
-            history_to = history.valid_to
+            if isinstance(history, IdentityVersion):
+                history_from = history.identity.valid_from or date.min
+                history_to = history.identity.valid_to or date.max
+            else:
+                history_from = history.valid_from
+                history_to = history.valid_to
+            if version_from <= history_to and history_from <= version_to:
+                raise ValueError("effective versions overlap")
+
+    @staticmethod
+    def _ensure_no_identity_overlap(
+        versions: Sequence[IdentityVersion],
+        valid_from: date,
+        valid_to: date | None,
+    ) -> None:
+        version_from = valid_from
+        version_to = valid_to if valid_to is not None else date.max
+        for history in versions:
+            history_from = history.identity.valid_from
+            history_to = history.identity.valid_to
             if history_to is None:
                 history_to = date.max
-            if version_from <= history_to and history.valid_from <= version_to:
-                raise ValueError("effective versions overlap")
+            if version_from <= history_to and history_from <= version_to:
+                raise ValueError("identity versions overlap")
 
     @staticmethod
     def _canonical_id(market: str, instrument_type: str, local_code: str) -> str:
