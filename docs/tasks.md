@@ -471,42 +471,42 @@ Parallel work is allowed only when tasks appear in the same execution wave and t
     - **Expected output / verify:** Generated queries prove filter/row limits, counts/parameters/snapshot metadata, exact `has_more`, and prior-result preservation; run the file with pytest.
     - **Property 47: Query limits and result metadata are exact.**
     - **Validates: Requirements 10.8, 10.9, 10.13**
-  - [ ] 9.4 Implement pure analytics results for returns, volatility, drawdown, moving average, and correlation
+  - [x] 9.4 Implement pure analytics results for returns, volatility, drawdown, moving average, and correlation
     - **Affected modules:** `src/stock_platform/domain/analytics.py`, `tests/unit/domain/test_analytics.py`.
     - **Prerequisites:** 1.3.
     - **Expected output / verify:** Exact documented formulas, missing/date alignment conventions, typed insufficient/invalid/undefined results, and display metadata; run focused tests.
     - _Requirements: 10.2-10.6, 10.10-10.12_
-  - [ ] 9.5 Write Property 41 test for consecutive non-missing periodic returns
+  - [x] 9.5 Write Property 41 test for consecutive non-missing periodic returns
     - **Affected modules:** `tests/property/test_property_41_periodic_returns.py`.
     - **Prerequisites:** 9.4, 1.2.
     - **Expected output / verify:** Generated dated numeric/missing series match an independent oracle; run the file with pytest.
     - **Property 41: Periodic returns follow consecutive non-missing observations.**
     - **Validates: Requirements 10.2**
-  - [ ] 9.6 Write Property 42 test for annualized sample volatility
+  - [x] 9.6 Write Property 42 test for annualized sample volatility
     - **Affected modules:** `tests/property/test_property_42_volatility.py`.
     - **Prerequisites:** 9.4, 1.2.
     - **Expected output / verify:** Generated returns match the `n-1` and sqrt(252) oracle/tolerance; run the file with pytest.
     - **Property 42: Annualized volatility matches the stated sample formula.**
     - **Validates: Requirements 10.3**
-  - [ ] 9.7 Write Property 43 test for running-maximum drawdown
+  - [x] 9.7 Write Property 43 test for running-maximum drawdown
     - **Affected modules:** `tests/property/test_property_43_drawdown.py`.
     - **Prerequisites:** 9.4, 1.2.
     - **Expected output / verify:** Generated positive/missing series match pointwise and maximum drawdown oracle; run the file with pytest.
     - **Property 43: Drawdown follows the running maximum.**
     - **Validates: Requirements 10.4**
-  - [ ] 9.8 Write Property 44 test for moving averages over exactly w non-missing values
+  - [x] 9.8 Write Property 44 test for moving averages over exactly w non-missing values
     - **Affected modules:** `tests/property/test_property_44_moving_average.py`.
     - **Prerequisites:** 9.4, 1.2.
     - **Expected output / verify:** Generated windows/series prove missing prefix and exact arithmetic mean; run the file with pytest.
     - **Property 44: Moving averages use exactly w non-missing observations.**
     - **Validates: Requirements 10.5**
-  - [ ] 9.9 Write Property 45 test for aligned Pearson correlation and zero variance
+  - [x] 9.9 Write Property 45 test for aligned Pearson correlation and zero variance
     - **Affected modules:** `tests/property/test_property_45_correlation.py`.
     - **Prerequisites:** 9.4, 1.2.
     - **Expected output / verify:** Generated dated series match independent aligned oracle and identify all zero-variance inputs; run the file with pytest.
     - **Property 45: Correlation uses only aligned shared dates and rejects zero variance.**
     - **Validates: Requirements 10.6, 10.11**
-  - [ ] 9.10 Write Property 48 test for invalid analysis input state preservation
+  - [x] 9.10 Write Property 48 test for invalid analysis input state preservation
     - **Affected modules:** `tests/property/test_property_48_invalid_analysis.py`.
     - **Prerequisites:** 9.4, 1.2.
     - **Expected output / verify:** Generated insufficient inputs/invalid windows return exact limits/counts and preserve prior result; run the file with pytest.
