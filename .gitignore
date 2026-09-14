@@ -9,4 +9,7 @@ coverage.xml
 dist/
 build/
 .venv/
+.start.log
+.start.pid
+.start.pid.bak
 stock_platform.sqlite3
