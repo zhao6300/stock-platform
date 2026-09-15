@@ -1,0 +1,229 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, replace
+from decimal import Decimal, InvalidOperation
+from hashlib import sha256
+from statistics import median as statistics_median
+
+from stock_platform.application.ai import AI_RESEARCH_PROVIDER_ID, AIAnalysisRequest
+from stock_platform.application.queries import QueryResult
+from stock_platform.domain.ai import (
+    AIAnalysisArtifact,
+    AIAnalysisIntent,
+    AIConfidence,
+    AIEvidence,
+    AIFinding,
+    AIMetric,
+    ai_evidence_id,
+    ai_finding_id,
+    analysis_identifier,
+)
+from stock_platform.domain.common import canonical_json
+from stock_platform.domain.research import DataSnapshotManifest
+
+DEFAULT_METRIC_FIELDS = {
+    "daily_bar": "close",
+    "fund_nav": "nav",
+}
+COMMON_LIMITATIONS = (
+    "Analysis is bounded to the pinned snapshot and selected rows.",
+    "The rule set is deterministic and does not introduce external market knowledge.",
+    "Output is research commentary, not investment advice.",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class _Observations:
+    """A typed bundle passed into the local reasoning rule set."""
+
+    entity: str
+    intent: AIAnalysisIntent
+    metric_field: str | None
+    fields: tuple[str, ...]
+    values: tuple[Decimal, ...]
+    row_count: int
+
+
+class LocalEvidenceReasoner:
+    """A deterministic local research reasoner that is constrained to data."""
+
+    provider_id = AI_RESEARCH_PROVIDER_ID
+    model_id = "platform-evidence-reasoner"
+    model_version = "1"
+    prompt_template_version = "feature-v1"
+    reasoning_rule_set_version = "deterministic-evidence-v1"
+
+    def analyze(
+        self,
+        request: AIAnalysisRequest,
+        snapshot: DataSnapshotManifest,
+        query_result: QueryResult,
+    ) -> AIAnalysisArtifact:
+        """Turn one bounded query into canonical evidence findings and metrics."""
+        fields = self._fields(query_result)
+        metric_field = request.metric_field
+        if metric_field is None:
+            metric_field = DEFAULT_METRIC_FIELDS.get(request.entity)
+        values = self._numeric_values(query_result, metric_field) if metric_field else ()
+        observations = _Observations(
+            entity=request.entity,
+            intent=request.intent,
+            metric_field=metric_field,
+            fields=fields,
+            values=values,
+            row_count=query_result.returned_count,
+        )
+        metrics, findings, summary = self._reason(observations)
+        evidence = self._evidence(request, snapshot, query_result)
+        artifact = AIAnalysisArtifact(
+            analysis_id="pending",
+            snapshot_id=request.snapshot_id,
+            entity=request.entity,
+            filters=tuple((filter_.field, filter_.value) for filter_ in request.filters),
+            intent=request.intent,
+            metric_field=metric_field,
+            provider_id=self.provider_id,
+            model_id=self.model_id,
+            model_version=self.model_version,
+            prompt_template_version=self.prompt_template_version,
+            reasoning_rule_set_version=self.reasoning_rule_set_version,
+            row_count=query_result.returned_count,
+            summary=summary,
+            findings=findings,
+            metrics=tuple(metrics),
+            evidence=(evidence,),
+            limitations=COMMON_LIMITATIONS,
+        )
+        return replace(artifact, analysis_id=analysis_identifier(artifact))
+
+    def _fields(self, query_result: QueryResult) -> tuple[str, ...]:
+        return tuple(field for field, _ in query_result.rows[0]) if query_result.rows else ()
+
+    def _numeric_values(
+        self, query_result: QueryResult, metric_field: str | None
+    ) -> tuple[Decimal, ...]:
+        if metric_field is None:
+            return ()
+        values: list[Decimal] = []
+        for row in query_result.rows:
+            for field, value in row:
+                if field == metric_field:
+                    try:
+                        values.append(_decimal(value))
+                    except (InvalidOperation, TypeError, ValueError):
+                        return ()
+        return tuple(values)
+
+    def _evidence(
+        self,
+        request: AIAnalysisRequest,
+        snapshot: DataSnapshotManifest,
+        query_result: QueryResult,
+    ) -> AIEvidence:
+        disclosure = canonical_json(query_result.as_dict()).encode("utf-8")
+        return AIEvidence(
+            evidence_id=ai_evidence_id(1),
+            entity=request.entity,
+            snapshot_id=request.snapshot_id,
+            filters=tuple((filter_.field, filter_.value) for filter_ in request.filters),
+            row_count=query_result.returned_count,
+            result_sha256=sha256(disclosure).hexdigest(),
+        )
+
+    def _reason(
+        self,
+        observations: _Observations,
+    ) -> tuple[tuple[AIMetric, ...], tuple[AIFinding, ...], str]:
+        entity = observations.entity
+        intent = observations.intent
+        metric_field = observations.metric_field
+        fields = observations.fields
+        values = observations.values
+        row_count = observations.row_count
+        count_decimal = Decimal(len(values))
+        count_metric = AIMetric("metric-001", "COUNT", metric_field, decimal_text(count_decimal))
+        if intent == "OVERVIEW":
+            if not values:
+                summary = f"Selected {entity} rows: {row_count}; observable fields: {len(fields)}."
+                confidence: AIConfidence = (
+                    "INSUFFICIENT_EVIDENCE" if row_count == 0 else "EVIDENCE_BACKED"
+                )
+                finding = AIFinding(ai_finding_id(1), summary, confidence, ("evidence-001",))
+                return (count_metric,), (finding,), summary
+            summary = (
+                f"Selected {entity} rows: {len(values)}; observable fields: {len(fields)};"
+                f" numeric metric: {metric_field}."
+            )
+            finding = AIFinding(ai_finding_id(1), summary, "EVIDENCE_BACKED", ("evidence-001",))
+            return (count_metric,), (finding,), summary
+        if not values:
+            summary = f"Selected {entity} rows: 0; numeric metric has no values."
+            finding = AIFinding(ai_finding_id(1), summary, "INSUFFICIENT_EVIDENCE", ("evidence-001",))
+            return (count_metric,), (finding,), summary
+        mean_value = sum(values, Decimal(0)) / len(values)
+        minimum, maximum = min(values), max(values)
+        spread = maximum - minimum
+        metrics: tuple[AIMetric, ...]
+        statements: tuple[str, ...]
+        if intent == "RANGE":
+            metrics = (
+                count_metric,
+                AIMetric("metric-002", "MIN", metric_field, decimal_text(minimum)),
+                AIMetric("metric-003", "MAX", metric_field, decimal_text(maximum)),
+                AIMetric("metric-004", "RANGE", metric_field, decimal_text(spread)),
+            )
+            statements = (
+                f"The range of {metric_field} is {decimal_text(spread)}.",
+                f"The observed minimum is {decimal_text(minimum)} and maximum is {decimal_text(maximum)}.",
+            )
+        elif intent == "CENTRAL_TENDENCY":
+            middle = statistics_median(values)
+            metrics = (
+                count_metric,
+                AIMetric("metric-002", "MIN", metric_field, decimal_text(minimum)),
+                AIMetric("metric-003", "MEAN", metric_field, decimal_text(mean_value)),
+                AIMetric("metric-004", "MEDIAN", metric_field, decimal_text(middle)),
+                AIMetric("metric-005", "MAX", metric_field, decimal_text(maximum)),
+            )
+            statements = (
+                f"The mean of {metric_field} is {decimal_text(mean_value)}.",
+                f"The median of {metric_field} is {decimal_text(middle)}.",
+                f"The observed minimum is {decimal_text(minimum)} and maximum is {decimal_text(maximum)}.",
+            )
+        else:
+            centered = (value - mean_value for value in values)
+            variance = sum((value * value for value in centered), Decimal(0)) / len(values)
+            deviation = variance.sqrt()
+            middle = statistics_median(values)
+            metrics = (
+                count_metric,
+                AIMetric("metric-002", "MIN", metric_field, decimal_text(minimum)),
+                AIMetric("metric-003", "MEDIAN", metric_field, decimal_text(middle)),
+                AIMetric("metric-004", "VARIANCE", metric_field, decimal_text(variance)),
+            )
+            statements = (
+                f"The population variance of {metric_field} is {decimal_text(variance)}.",
+                f"The population standard deviation is {decimal_text(deviation)}.",
+            )
+        findings = tuple(
+            AIFinding(ai_finding_id(number), statement, "EVIDENCE_BACKED", ("evidence-001",))
+            for number, statement in enumerate(statements, start=2)
+        )
+        summary = f"Analyzed {len(values)} {entity} rows using {metric_field}."
+        return metrics, findings, summary
+
+
+def decimal_text(value: Decimal) -> str:
+    """Canonicalize one exact numeric metric for stable artifacts."""
+    return format(value.normalize(), "f")
+
+
+def _decimal(value: object) -> Decimal:
+    """Convert one platform-owned numeric value into an exact Decimal."""
+    if isinstance(value, Decimal):
+        return value
+    if isinstance(value, (str, int)):
+        return Decimal(value)
+    if isinstance(value, float):
+        return Decimal(str(value))
+    raise TypeError("not a decimal-compatible scalar")

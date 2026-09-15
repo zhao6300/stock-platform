@@ -323,3 +323,15 @@
 8. IF a requested backup's schema version is absent from the restore-compatible schema versions or any backup record-count or content-checksum verification fails, THEN THE Platform SHALL reject the restoration, preserve the complete pre-restore local state unchanged, and report every failed compatibility or verification condition.
 9. WHEN the Platform creates a backup, THE Platform SHALL verify the record count and content checksum of every included dataset against the backup manifest and mark the backup as restorable only when every verification succeeds.
 
+### Requirement 15: AI Evidence Boundary
+
+**User Story:** 作为本地用户，我希望 AI 能解释已冻结的数据快照，但不会引入外部结论或隐藏检索。
+
+#### Acceptance Criteria
+
+1. THE AI_Research_Assistant SHALL require a pinned Data_Snapshot before producing any AI_Research_Artifact.
+2. THE AI_Research_Assistant SHALL restrict each request to whitelisted research entities and no more than 20 filters.
+3. THE AI_Research_Assistant SHALL use the same bounded research-query result shape as the read-only research interface, with at most 10000 returned observations.
+4. WHEN the AI_Research_Assistant returns a finding, THE AI_Research_Assistant SHALL include the model identifier, model version, prompt_template version, reasoning rule-set version, snapshot identifier, entity, filters, observation count, content-addressed analysis identifier, and at least one evidence reference.
+5. IF no applicable numeric value or no matching observation is available, THEN THE AI_Research_Assistant SHALL return an insufficient-evidence result without inventing an external-market conclusion.
+6. THE default AI_Research_Assistant SHALL perform zero outbound network requests and SHALL not receive credentials or secret material.

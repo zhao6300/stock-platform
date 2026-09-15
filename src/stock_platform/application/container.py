@@ -4,8 +4,10 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
+from stock_platform.application.ai import AIResearchProvider
 from stock_platform.application.backup import BackupPlatformState
 from stock_platform.application.status import StatusDiagnostics
+from stock_platform.domain.ai import AIAnalysisArtifact
 from stock_platform.domain.research import DataSnapshotManifest, data_snapshot_id
 
 type ProviderName = str
@@ -43,6 +45,8 @@ class ApplicationContainer:
     credential_references: frozenset[str] = frozenset()
     snapshots: dict[str, DataSnapshotManifest] = field(default_factory=dict)
     reject_confirmations: set[str] = field(default_factory=set)
+    ai_reasoner: AIResearchProvider | None = None
+    ai_results: dict[str, AIAnalysisArtifact] = field(default_factory=dict)
 
     def status(self) -> StatusDiagnostics:
         """Return the summary diagnostics exposed through local APIs."""
@@ -90,6 +94,17 @@ class ApplicationContainer:
         self.reject_confirmations.add(snapshot_id)
         return True
 
+    def record_ai_analysis(self, artifact: AIAnalysisArtifact) -> str:
+        """Register one content-addressed AI artifact in local audit state."""
+        self.ai_results[artifact.analysis_id] = artifact
+        return artifact.analysis_id
+
+    def require_ai_reasoner(self) -> AIResearchProvider:
+        """Reject AI composition before accepting any user request."""
+        if self.ai_reasoner is None:
+            raise LookupError("AI reasoner is not installed")
+        return self.ai_reasoner
+
     def backup_platform_state(self) -> BackupPlatformState:
         """Build the local backup inventory source from current state."""
         return BackupPlatformState(
@@ -102,6 +117,6 @@ class ApplicationContainer:
             quality_reports=(),
             snapshot_ids=tuple(self.snapshots),
             manifests=(),
-            research_results=(),
+            research_results=tuple(self.ai_results),
             credentials=tuple(self.credential_references),
         )

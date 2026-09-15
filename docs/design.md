@@ -379,6 +379,14 @@ Runner 负责：冻结 snapshot、确认 rejected data、构造 canonical manife
 
 `dependency_environment_id = sha256(lockfile + python_version + platform_arch + numeric_runtime_versions + application_build)`。策略源代码/包 wheel 的 SHA-256 构成 `research_logic_version`；工作树未提交不是禁止条件，但其内容哈希必须进入 manifest。
 
+### 10.5 AI Research Assistant
+
+AI 是研究解释层，不是自由聊天、行情代理或决策引擎。默认实现 `LocalEvidenceReasoner` 在本地运行，调用与查询 UI 相同的白名单查询结果；流程完全不联网，也不将凭据、文件路径或未选中的数据库行送入模型。请求必须携带已冻结的 `snapshot_id`，并在 `OVERVIEW`、`RANGE`、`CENTRAL_TENDENCY`、`VOLATILITY` 四个 feature intent 中选择。
+
+每个 AI artifact 记录 model/provider 版本、prompt template 版本、rule set 版本、行数、过滤器和 `result_sha256`。finding 只引用 evidence ID，metric 只来自固定规则（估算范围、均值、中位数、方差）。无数据或指标不可用时输出 `INSUFFICIENT_EVIDENCE`；模型不会用外部市场知识补全。`analysis_id = ai-sha256:<canonical json digest>`，相同输入必然产生相同 artifact，并进入本地备份清单。
+
+未来可替换的用户托管模型必须实现同一个 `AIResearchProvider` port，继续在编排层完成 snapshot/query validation、模型输入裁剪、redaction、content hash 和错误拒绝；平台不默认启用外发模型请求。
+
 ### 11. Backtest Engine
 
 组件分为 `StrategyProtocol`、`MarketView`、`SignalValidator`、`ExecutionSimulator`、`Ledger`、`ValuationService` 和 `ReportBuilder`。策略只输出目标数量或买卖请求，不接触 repository、network 或未来游标。
@@ -941,6 +949,7 @@ For all backup manifests, schema compatibility values, and per-dataset count/che
 | `POST /ingestions`, `POST /ingestions/{id}/resume`, `GET /ingestions/{id}` | 摄取、恢复与进度。 |
 | `POST /snapshots`, `POST /snapshots/{id}/confirm-rejected` | 快照冻结与显式确认。 |
 | `POST /research/query` | 唯一公开的脚本查询入口；只读、typed filters、10k/20 限制。 |
+| `POST /research/ai-analysis` | 本地 snapshots 内的 feature-scoped AI 解释；要求 pinned snapshot，返回 evidence 和 content ID。 |
 | `POST /analyses`, `POST /backtests`, `POST /research-runs/{id}/replay` | 研究运行；先落 manifest。 |
 | `POST /exports`, `POST /backups`, `POST /restores` | 合规导出与本地恢复工作流。 |
 
@@ -948,11 +957,11 @@ For all backup manifests, schema compatibility values, and per-dataset count/che
 
 ### CLI
 
-CLI 与 HTTP 路由调用相同 application use cases，不复制业务逻辑：`stock-research status`、`provider list/configure/enable`、`compliance add`、`credential set/delete`、`security register/map`、`ingest start/resume/show`、`snapshot create/confirm`、`query`、`analyze`、`backtest run`、`research replay/diff`、`backup create/verify`、`restore`、`migrate`。所有查询命令支持 `--json`；secret 只通过隐藏输入或 stdin/file descriptor 读取，不接受命令行参数，避免 shell history 泄漏。无任何 order/broker 命令。
+CLI 与 HTTP 路由调用相同 application use cases，不复制业务逻辑：`stock-research status`、`provider list/configure/enable`、`compliance add`、`credential set/delete`、`security register/map`、`ingest start/resume/show`、`snapshot create/confirm`、`ai-analyze`、`query`、`analyze`、`backtest run`、`research replay/diff`、`backup create/verify`、`restore`、`migrate`。所有查询命令支持 `--json`；secret 只通过隐藏输入或 stdin/file descriptor 读取，不接受命令行参数，避免 shell history 泄漏。无任何 order/broker 命令。
 
 ### Python 只读客户端
 
-`stock_platform.client.open_snapshot(snapshot_id)` 返回只读 facade，只暴露 ResearchQuery 和 analytics 输入导出；不返回 SQLite connection、DuckDB write connection 或对象存储路径。脚本创建 Research Run 时必须经 Runner，不能自行发布 manifest/result。
+`stock_platform.client.open_snapshot(snapshot_id)` 返回只读 facade，只暴露 ResearchQuery、feature-scoped AI analysis 和 analytics 输入导出；不返回 SQLite connection、DuckDB write connection 或对象存储路径。脚本创建 Research Run 时必须经 Runner，不能自行发布 manifest/result。
 
 ## Error Handling
 
@@ -1076,4 +1085,3 @@ MVP 不设大型分布式性能目标，但提供可重复基准：100 万 Daily
 - provider contract suite、backup/restore fault matrix、deterministic replay、OpenAPI/CLI no-order smoke、macOS Keychain smoke 全部通过。
 - schema migration 能从首个发布版本升级，并证明失败时可恢复；生成的 backup 被独立 verify 标记为 restorable。
 - 文档中的外部链接只用于技术依据；实现不复制任何外部大型项目架构或未审查代码。
-

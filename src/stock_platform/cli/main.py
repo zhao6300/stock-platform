@@ -5,8 +5,13 @@ from datetime import UTC, datetime
 
 import typer
 
+from stock_platform.application.ai import AIAnalysisRequest, execute_ai_analysis
 from stock_platform.application.container import ApplicationContainer
+from stock_platform.application.queries import QueryFilter
+from stock_platform.domain.ai import parse_ai_analysis_intent
+from stock_platform.domain.common import Failure
 from stock_platform.domain.research import DataSnapshotManifest
+from stock_platform.infrastructure.ai.reasoner import LocalEvidenceReasoner
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,7 +21,7 @@ class CliContext:
     container: ApplicationContainer
 
 
-context = CliContext(ApplicationContainer())
+context = CliContext(ApplicationContainer(ai_reasoner=LocalEvidenceReasoner()))
 
 
 app = typer.Typer(no_args_is_help=True)
@@ -105,3 +110,51 @@ def snapshot_confirm(snapshot_id: str) -> None:
         typer.echo(f"error={error}", err=True)
         raise typer.Exit(code=2) from error
     typer.echo(f"confirmed snapshot_id={snapshot_id} confirmed={confirmed}")
+
+
+def _parse_filter(text: str) -> QueryFilter:
+    """Parse one exact-match AI query filter."""
+    field, separator, value = text.partition("=")
+    if not separator or not field:
+        raise typer.BadParameter("filter must use field=value")
+    return QueryFilter(field, value)
+
+
+@app.command(name="ai-analyze")
+def ai_analyze(
+    entity: str,
+    snapshot_id: str,
+    sort_field: str,
+    intent: str = "OVERVIEW",
+    filters: list[str] = typer.Option(default_factory=list, metavar="FILTER", help="field=value."),  # noqa: B008
+) -> None:
+    """Run the deterministic local evidence reasoner against a pinned snapshot."""
+    try:
+        filter_values = tuple(_parse_filter(text) for text in filters)
+        intent_type = parse_ai_analysis_intent(intent)
+    except typer.BadParameter as error:
+        typer.echo(f"error={error}", err=True)
+        raise typer.Exit(code=2) from error
+    if intent_type is None:
+        typer.echo(f"error=unsupported AI intent: {intent}", err=True)
+        raise typer.Exit(code=2) from None
+    request = AIAnalysisRequest(
+        entity=entity,
+        snapshot_id=snapshot_id,
+        intent=intent_type,
+        sort_field=sort_field,
+        filters=filter_values,
+    )
+    result = execute_ai_analysis(
+        request,
+        context.container.catalog,
+        context.container.snapshots,
+        context.container.require_ai_reasoner(),
+    )
+    if isinstance(result, Failure):
+        typer.echo(f"error={result.error.statement}", err=True)
+        raise typer.Exit(code=2) from None
+    artifact = result.value
+    analysis_id = context.container.record_ai_analysis(artifact)
+    typer.echo(f"analysis={analysis_id}")
+    typer.echo(f"model={artifact.model_id} findings={len(artifact.findings)}")

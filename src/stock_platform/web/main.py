@@ -9,19 +9,22 @@ from fastapi.responses import HTMLResponse
 from jinja2 import BaseLoader, Environment
 from pydantic import BaseModel, Field
 
+from stock_platform.application.ai import AIAnalysisRequest, execute_ai_analysis
 from stock_platform.application.container import ApplicationContainer
 from stock_platform.application.queries import QueryFilter, ResearchQuery, execute_research_query
 from stock_platform.application.status import StatusDiagnostics
-from stock_platform.domain.common import Success
+from stock_platform.domain.ai import AIAnalysisIntent
+from stock_platform.domain.common import Failure, Success
 from stock_platform.domain.research import (
     DataObjectReference,
     DataSnapshotManifest,
 )
+from stock_platform.infrastructure.ai.reasoner import LocalEvidenceReasoner
 from stock_platform.web.access import enforce_loopback
 
 jinja2_environment = Environment(loader=BaseLoader())
 
-container = ApplicationContainer()
+container = ApplicationContainer(ai_reasoner=LocalEvidenceReasoner())
 app = FastAPI(title="Personal Stock & Fund Research Platform")
 
 
@@ -61,6 +64,28 @@ class ResearchQueryResponse(BaseModel):
     returned_count: int
     rows: tuple[tuple[tuple[str, object], ...], ...]
     has_more: bool
+
+
+class AIAnalysisRequestModel(BaseModel):
+    """A feature-scoped request to run the local deterministic reasoning model."""
+
+    entity: str
+    snapshot_id: str
+    intent: AIAnalysisIntent
+    sort_field: str
+    filters: tuple[QueryFilterRequest, ...] = Field(default=(), max_length=20)
+    metric_field: str | None = None
+    model_config = {"extra": "forbid"}
+
+    def to_domain(self) -> AIAnalysisRequest:
+        return AIAnalysisRequest(
+            entity=self.entity,
+            snapshot_id=self.snapshot_id,
+            intent=self.intent,
+            sort_field=self.sort_field,
+            filters=tuple(QueryFilter(item.field, item.value) for item in self.filters),
+            metric_field=self.metric_field,
+        )
 
 
 class DataObjectReferenceRequest(BaseModel):
@@ -137,7 +162,7 @@ async def list_providers(request: Request) -> dict[str, tuple[str, ...]]:
 @app.post("/api/v1/providers/{provider_id}/configure")
 async def configure_provider(
     provider_id: str, body: ProviderConfigureRequest, request: Request
-) -> dict[str, object]:
+) -> Mapping[str, object]:
     """Install or refresh one provider configuration locally."""
     enforce_loopback(request, write=True)
     configuration: Mapping[str, Any] = container.configure_provider(
@@ -186,6 +211,28 @@ async def delete_credential(reference: str, request: Request) -> dict[str, str]:
     return {"deleted": reference}
 
 
+@app.post("/api/v1/research/ai-analysis")
+async def run_ai_analysis(
+    body: AIAnalysisRequestModel, request: Request
+) -> Mapping[str, object]:
+    """Run the local evidence reasoner and register only the pinned result."""
+    enforce_loopback(request, write=True)
+    result = execute_ai_analysis(
+        body.to_domain(),
+        container.catalog,
+        container.snapshots,
+        container.require_ai_reasoner(),
+    )
+    if isinstance(result, Failure):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=result.error.statement,
+        )
+    artifact = result.value
+    container.record_ai_analysis(artifact)
+    return artifact.as_dict()
+
+
 @app.post("/api/v1/snapshots", status_code=status.HTTP_201_CREATED)
 async def create_snapshot(body: SnapshotCreateRequest, request: Request) -> dict[str, str]:
     """Freeze one snapshot and return only its canonical ID."""
@@ -218,6 +265,11 @@ async def research_page() -> str:
     <h1>Local Research Platform</h1>
     <p>Adjustment mode: {{ adjustment_mode }}</p>
     <p>Data quality: {{ quality }}</p>
+    <section id="ai-analysis">
+      <h2>AI evidence assistant</h2>
+      <p>Snapshots only. LOCAL EVIDENCE REASONER. No secret access. No external calls.</p>
+      <p>OVERVIEW | RANGE | CENTRAL_TENDENCY | VOLATILITY</p>
+    </section>
     <p>Research estimate, not investment advice.</p>
   </body>
 </html>"""
