@@ -5,7 +5,8 @@ from datetime import UTC, datetime
 
 import typer
 
-from stock_platform.application.ai import AIAnalysisRequest, execute_ai_analysis
+from stock_platform.application.ai import AIAnalysisRequest, execute_ai_analysis_with_registry
+from stock_platform.application.ai_workflow import AIWorkflowRequest, execute_ai_workflow
 from stock_platform.application.container import ApplicationContainer
 from stock_platform.application.queries import QueryFilter
 from stock_platform.domain.ai import parse_ai_analysis_intent
@@ -22,6 +23,9 @@ class CliContext:
 
 
 context = CliContext(ApplicationContainer(ai_reasoner=LocalEvidenceReasoner()))
+context.container.ai_provider_registry = context.container.ai_provider_registry.with_provider(
+    "local-evidence-reasoner", LocalEvidenceReasoner()
+)
 
 
 app = typer.Typer(no_args_is_help=True)
@@ -39,6 +43,13 @@ def provider_list() -> None:
     """Print installed provider identifiers without reading secrets."""
     for provider in context.container.providers:
         typer.echo(provider)
+
+
+@app.command(name="ai-provider-list")
+def ai_provider_list() -> None:
+    """Print registered AI provider identifiers without reading secrets."""
+    for provider_id in context.container.installed_ai_provider_ids():
+        typer.echo(provider_id)
 
 
 @app.command(name="provider-configure")
@@ -121,12 +132,13 @@ def _parse_filter(text: str) -> QueryFilter:
 
 
 @app.command(name="ai-analyze")
-def ai_analyze(
+def ai_analyze(  # noqa: PLR0913
     entity: str,
     snapshot_id: str,
     sort_field: str,
     intent: str = "OVERVIEW",
     filters: list[str] = typer.Option(default_factory=list, metavar="FILTER", help="field=value."),  # noqa: B008
+    provider: str | None = typer.Option(None, help="Registered AI provider ID."),
 ) -> None:
     """Run the deterministic local evidence reasoner against a pinned snapshot."""
     try:
@@ -144,12 +156,13 @@ def ai_analyze(
         intent=intent_type,
         sort_field=sort_field,
         filters=filter_values,
+        provider_id=provider,
     )
-    result = execute_ai_analysis(
+    result = execute_ai_analysis_with_registry(
         request,
         context.container.catalog,
         context.container.snapshots,
-        context.container.require_ai_reasoner(),
+        context.container.ai_provider_registry,
     )
     if isinstance(result, Failure):
         typer.echo(f"error={result.error.statement}", err=True)
@@ -158,3 +171,39 @@ def ai_analyze(
     analysis_id = context.container.record_ai_analysis(artifact)
     typer.echo(f"analysis={analysis_id}")
     typer.echo(f"model={artifact.model_id} findings={len(artifact.findings)}")
+
+
+@app.command(name="ai-workflow")
+def ai_workflow(
+    entity: str,
+    snapshot_id: str,
+    sort_field: str,
+    filters: list[str] = typer.Option(default_factory=list, metavar="FILTER", help="field=value."),  # noqa: B008
+    provider: str | None = typer.Option(None, help="Registered AI provider ID."),
+) -> None:
+    """Run the fixed lifecycle workflow against one pinned snapshot."""
+    try:
+        filter_values = tuple(_parse_filter(text) for text in filters)
+    except typer.BadParameter as error:
+        typer.echo(f"error={error}", err=True)
+        raise typer.Exit(code=2) from error
+    request = AIWorkflowRequest(
+        entity=entity,
+        snapshot_id=snapshot_id,
+        sort_field=sort_field,
+        filters=filter_values,
+        provider_id=provider,
+    )
+    result = execute_ai_workflow(
+        request,
+        context.container.catalog,
+        context.container.snapshots,
+        context.container.ai_provider_registry,
+    )
+    if isinstance(result, Failure):
+        typer.echo(f"error={result.error.statement}", err=True)
+        raise typer.Exit(code=2) from None
+    artifact = result.value
+    workflow_id = context.container.record_ai_workflow(artifact)
+    typer.echo(f"workflow={workflow_id}")
+    typer.echo(f"provider={artifact.provider_id} stages={len(artifact.stages)}")

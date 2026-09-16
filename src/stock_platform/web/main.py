@@ -9,7 +9,12 @@ from fastapi.responses import HTMLResponse
 from jinja2 import BaseLoader, Environment
 from pydantic import BaseModel, Field
 
-from stock_platform.application.ai import AIAnalysisRequest, execute_ai_analysis
+from stock_platform.application.ai import (
+    AIAnalysisRequest,
+    AIProviderRegistry,
+    execute_ai_analysis_with_registry,
+)
+from stock_platform.application.ai_workflow import AIWorkflowRequest, execute_ai_workflow
 from stock_platform.application.container import ApplicationContainer
 from stock_platform.application.queries import QueryFilter, ResearchQuery, execute_research_query
 from stock_platform.application.status import StatusDiagnostics
@@ -25,6 +30,11 @@ from stock_platform.web.access import enforce_loopback
 jinja2_environment = Environment(loader=BaseLoader())
 
 container = ApplicationContainer(ai_reasoner=LocalEvidenceReasoner())
+container.ai_provider_registry = AIProviderRegistry(
+    providers=(),
+    default_provider_id="local-evidence-reasoner",
+)
+container.register_ai_provider("local-evidence-reasoner", LocalEvidenceReasoner())
 app = FastAPI(title="Personal Stock & Fund Research Platform")
 
 
@@ -75,6 +85,7 @@ class AIAnalysisRequestModel(BaseModel):
     sort_field: str
     filters: tuple[QueryFilterRequest, ...] = Field(default=(), max_length=20)
     metric_field: str | None = None
+    provider_id: str | None = Field(default=None, min_length=1, max_length=128)
     model_config = {"extra": "forbid"}
 
     def to_domain(self) -> AIAnalysisRequest:
@@ -85,7 +96,12 @@ class AIAnalysisRequestModel(BaseModel):
             sort_field=self.sort_field,
             filters=tuple(QueryFilter(item.field, item.value) for item in self.filters),
             metric_field=self.metric_field,
+            provider_id=self.provider_id,
         )
+
+
+class AIWorkflowRequestModel(AIAnalysisRequestModel):
+    """A request to run the complete, fixed lifecycle workflow."""
 
 
 class DataObjectReferenceRequest(BaseModel):
@@ -217,11 +233,11 @@ async def run_ai_analysis(
 ) -> Mapping[str, object]:
     """Run the local evidence reasoner and register only the pinned result."""
     enforce_loopback(request, write=True)
-    result = execute_ai_analysis(
+    result = execute_ai_analysis_with_registry(
         body.to_domain(),
         container.catalog,
         container.snapshots,
-        container.require_ai_reasoner(),
+        container.ai_provider_registry,
     )
     if isinstance(result, Failure):
         raise HTTPException(
@@ -230,6 +246,47 @@ async def run_ai_analysis(
         )
     artifact = result.value
     container.record_ai_analysis(artifact)
+    return artifact.as_dict()
+
+
+@app.get("/api/v1/research/ai-providers")
+async def list_ai_providers(request: Request) -> Mapping[str, object]:
+    """List registered AI providers without exposing endpoint or secret state."""
+    enforce_loopback(request)
+    registry = container.ai_provider_registry
+    return {
+        "providers": registry.provider_ids(),
+        "default_provider": registry.default_provider_id,
+    }
+
+
+@app.post("/api/v1/research/ai-workflow")
+async def run_ai_workflow(
+    body: AIWorkflowRequestModel, request: Request
+) -> Mapping[str, object]:
+    """Run all five lifecycle gates with one registered AI provider."""
+    enforce_loopback(request, write=True)
+    workflow_request = AIWorkflowRequest(
+        entity=body.entity,
+        snapshot_id=body.snapshot_id,
+        sort_field=body.sort_field,
+        filters=tuple(QueryFilter(item.field, item.value) for item in body.filters),
+        metric_field=body.metric_field,
+        provider_id=body.provider_id,
+    )
+    result = execute_ai_workflow(
+        workflow_request,
+        container.catalog,
+        container.snapshots,
+        container.ai_provider_registry,
+    )
+    if isinstance(result, Failure):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=result.error.statement,
+        )
+    artifact = result.value
+    container.record_ai_workflow(artifact)
     return artifact.as_dict()
 
 

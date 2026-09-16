@@ -9,8 +9,22 @@ from stock_platform.domain.common import JsonObject, canonical_json
 type AIAnalysisIntent = Literal["OVERVIEW", "RANGE", "CENTRAL_TENDENCY", "VOLATILITY"]
 type AIConfidence = Literal["EVIDENCE_BACKED", "INSUFFICIENT_EVIDENCE"]
 type AIMetricKind = Literal["COUNT", "MIN", "MEAN", "MEDIAN", "MAX", "VARIANCE", "RANGE"]
+type AIWorkflowStageType = Literal[
+    "INGESTION_READINESS",
+    "DATA_QUALITY",
+    "RESEARCH_REVIEW",
+    "RISK_DECISION",
+    "REPORT_BRIEFING",
+]
 
 AI_INTENT_VALUES = ("OVERVIEW", "RANGE", "CENTRAL_TENDENCY", "VOLATILITY")
+AI_WORKFLOW_STAGES: tuple[AIWorkflowStageType, ...] = (
+    "INGESTION_READINESS",
+    "DATA_QUALITY",
+    "RESEARCH_REVIEW",
+    "RISK_DECISION",
+    "REPORT_BRIEFING",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +47,14 @@ class AIMetric:
     kind: AIMetricKind
     field: str | None
     value: str | None
+
+    def as_dict(self) -> JsonObject:
+        return {
+            "metric_id": self.metric_id,
+            "kind": self.kind,
+            "field": self.field,
+            "value": self.value,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,6 +148,45 @@ def analysis_identifier(artifact: AIAnalysisArtifact) -> str:
     return f"ai-sha256:{digest}"
 
 
+@dataclass(frozen=True, slots=True)
+class AIWorkflowStageResult:
+    """One fixed lifecycle gate resolved by a registered AI provider."""
+
+    stage: AIWorkflowStageType
+    analysis_id: str
+    summary: str
+
+    def as_dict(self) -> JsonObject:
+        result: JsonObject = {
+            "stage": self.stage,
+            "analysis_id": self.analysis_id,
+            "summary": self.summary,
+        }
+        return result
+
+
+@dataclass(frozen=True, slots=True)
+class AIWorkflowArtifact:
+    """An immutable multi-stage workflow bound to one pinned snapshot."""
+
+    workflow_id: str
+    snapshot_id: str
+    provider_id: str
+    intent: AIAnalysisIntent
+    filters: tuple[tuple[str, str], ...]
+    stages: tuple[AIWorkflowStageResult, ...]
+
+    def as_dict(self) -> JsonObject:
+        return {
+            "workflow_id": self.workflow_id,
+            "snapshot_id": self.snapshot_id,
+            "provider_id": self.provider_id,
+            "intent": self.intent,
+            "filters": [{"field": key, "value": value} for key, value in self.filters],
+            "stages": [stage.as_dict() for stage in self.stages],
+        }
+
+
 def parse_ai_analysis_intent(value: str) -> AIAnalysisIntent | None:
     """Reject an unknown intent before composing an application request."""
     normalized = value.strip().upper()
@@ -148,3 +209,11 @@ def ai_finding_id(number: int) -> str:
 def ai_evidence_id(number: int) -> str:
     """Create the stable evidence identifier for one local analysis."""
     return f"evidence-{number:03d}"
+
+
+def workflow_identifier(artifact: AIWorkflowArtifact) -> str:
+    """Create the content-bound identifier for one complete workflow."""
+    contents = artifact.as_dict()
+    contents.pop("workflow_id")
+    digest = sha256(canonical_json(contents).encode("utf-8")).hexdigest()
+    return f"ai-workflow-sha256:{digest}"

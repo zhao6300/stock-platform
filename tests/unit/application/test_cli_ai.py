@@ -65,3 +65,39 @@ def test_cli_ai_analyze_runs_the_registered_local_reasoner() -> None:
     assert "model=platform-evidence-reasoner" in result.output
     assert unpinned.exit_code != 0
     assert "error=AI snapshot not pinned" in unpinned.output
+
+
+def test_cli_ai_workflow_reaches_the_registered_local_reasoner() -> None:
+    manifest = DataSnapshotManifest(
+        dataset_version_id="cli-workflow-dataset",
+        objects=(DataObjectReference(sha256="0" * 64, schema_id="bars-v1", rows=2),),
+        security_master_versions=(),
+        mapping_versions=(),
+        calendar_versions=(),
+        factor_series_versions=(),
+        quality_rule_set_version="rules-v1",
+        quality_assessment_cutoff=datetime(2026, 1, 31, tzinfo=UTC),
+    )
+    snapshot_id = context.container.create_snapshot(manifest)
+    rows: tuple[dict[str, Any], ...] = (
+        {"security_id": "A", "close": 10},
+        {"security_id": "B", "close": 12},
+    )
+    context.container.catalog[(snapshot_id, "daily_bar")] = rows
+
+    result = CliRunner().invoke(
+        application,
+        [
+            "ai-workflow",
+            "daily_bar",
+            snapshot_id,
+            "close",
+            "--provider",
+            "local-evidence-reasoner",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "workflow=ai-workflow-sha256:" in result.output
+    assert "provider=local-evidence-reasoner stages=5" in result.output
+    assert context.container.installed_ai_provider_ids() == ("local-evidence-reasoner",)

@@ -379,13 +379,33 @@ Runner 负责：冻结 snapshot、确认 rejected data、构造 canonical manife
 
 `dependency_environment_id = sha256(lockfile + python_version + platform_arch + numeric_runtime_versions + application_build)`。策略源代码/包 wheel 的 SHA-256 构成 `research_logic_version`；工作树未提交不是禁止条件，但其内容哈希必须进入 manifest。
 
-### 10.5 AI Research Assistant
+### 10.5 AI Research Workflow
 
-AI 是研究解释层，不是自由聊天、行情代理或决策引擎。默认实现 `LocalEvidenceReasoner` 在本地运行，调用与查询 UI 相同的白名单查询结果；流程完全不联网，也不将凭据、文件路径或未选中的数据库行送入模型。请求必须携带已冻结的 `snapshot_id`，并在 `OVERVIEW`、`RANGE`、`CENTRAL_TENDENCY`、`VOLATILITY` 四个 feature intent 中选择。
+AI 是研究使我们能更快的辅助层，不是自由聊天、行情代理或决策引擎。默认实现 `LocalEvidenceReasoner` 在本地运行，调用与查询 UI 相同的白名单查询结果；流程完全不联网，也不将凭据、文件路径或未选中的数据库行送入模型。请求必须携带已冻结的 `snapshot_id`，并在 `OVERVIEW`、`RANGE`、`CENTRAL_TENDENCY`、`VOLATILITY` 四个 feature intent 中选择。
+
+AI workflow 生命周期是一次显式请求触发，固定五阶段依次生成五个独立可审计分析：
+
+1. `INGESTION_READINESS`：检查 pinned manifest 数据量、对象数、quality rule set 与 cutoff，说明数据是否已具备研究起点。
+2. `DATA_QUALITY`：明确证据仍受 pinned rule set 和 cutoff 约束，避免把未确认数据混入研究。
+3. `RESEARCH_REVIEW`：使用同一实体/过滤器生成 bounded metric evidence（先使用 range 视角）。
+4. `RISK_DECISION`：生成 dispers ion 视角（variance/standard deviation），输出为研究摘要而非投资建议。
+5. `REPORT_BRIEFING`：汇总前序阶段，将中心趋势作为报告导入口。
 
 每个 AI artifact 记录 model/provider 版本、prompt template 版本、rule set 版本、行数、过滤器和 `result_sha256`。finding 只引用 evidence ID，metric 只来自固定规则（估算范围、均值、中位数、方差）。无数据或指标不可用时输出 `INSUFFICIENT_EVIDENCE`；模型不会用外部市场知识补全。`analysis_id = ai-sha256:<canonical json digest>`，相同输入必然产生相同 artifact，并进入本地备份清单。
 
-未来可替换的用户托管模型必须实现同一个 `AIResearchProvider` port，继续在编排层完成 snapshot/query validation、模型输入裁剪、redaction、content hash 和错误拒绝；平台不默认启用外发模型请求。
+全部阶段必须在 application 编排层完成 snapshot/query validation、record count、boundhash 和错误拒绝。Reusable provider registry 使用 stable provider ID 路径：
+
+1. `AIProviderBinding(provider_id, provider)` 转换一个写入 `AIResearchProvider` port 的模型到 registry entry。
+2. `AIProviderRegistry.resolve(provider_id_or_none)` 将缺省 ID 解析到一个 provider；不预置 HTTP provider，默认执行完全本地。
+3. 每个路由/CLI 请求带有可选 `provider_id`；该值只选择 registry 中已出现的 binding，never 自行执行 exec/eval/import。
+4. 新增 provider 必须填 model ID/version、prompt version、rule set version，创建 provable `AIAnalysisArtifact`，保留 evidence ID 和 content-addressed ID。
+
+用户托管的远端模型的推荐接入是 `RemoteEvidenceReasoner`：
+
+1. 先用 `LocalEvidenceReasoner` 构建 metrics、evidence hash 与 findings（仍无联网）。
+2. 将 canonical metrics/limitations 打包为 prompt，而不发送 raw rows、SQL、路径、文件内容或凭据。
+3. provider adapter 的 transport client 负责 endpoint、TLS/rebinding、rate limit/timeout 与 credential separation。
+4. 远端 text 称为 summary/简报。原始 findings/metrics/evidence 不被模型 overwrites；若 provider 返回非 schema 文本，则必须抛 typed contract error。
 
 ### 11. Backtest Engine
 
@@ -950,6 +970,8 @@ For all backup manifests, schema compatibility values, and per-dataset count/che
 | `POST /snapshots`, `POST /snapshots/{id}/confirm-rejected` | 快照冻结与显式确认。 |
 | `POST /research/query` | 唯一公开的脚本查询入口；只读、typed filters、10k/20 限制。 |
 | `POST /research/ai-analysis` | 本地 snapshots 内的 feature-scoped AI 解释；要求 pinned snapshot，返回 evidence 和 content ID。 |
+| `POST /research/ai-workflow` | 五阶段 pinned AI lifecycle workflow；每个 stage 关联一个独立 content-addressed analysis。 |
+| `GET /research/ai-providers` | 只读 provider IDs/default provider，如论 secret 或模型 endpoint details。 |
 | `POST /analyses`, `POST /backtests`, `POST /research-runs/{id}/replay` | 研究运行；先落 manifest。 |
 | `POST /exports`, `POST /backups`, `POST /restores` | 合规导出与本地恢复工作流。 |
 
@@ -957,7 +979,7 @@ For all backup manifests, schema compatibility values, and per-dataset count/che
 
 ### CLI
 
-CLI 与 HTTP 路由调用相同 application use cases，不复制业务逻辑：`stock-research status`、`provider list/configure/enable`、`compliance add`、`credential set/delete`、`security register/map`、`ingest start/resume/show`、`snapshot create/confirm`、`ai-analyze`、`query`、`analyze`、`backtest run`、`research replay/diff`、`backup create/verify`、`restore`、`migrate`。所有查询命令支持 `--json`；secret 只通过隐藏输入或 stdin/file descriptor 读取，不接受命令行参数，避免 shell history 泄漏。无任何 order/broker 命令。
+CLI 与 HTTP 路由调用相同 application use cases，不复制业务逻辑：`stock-research status`、`provider list/configure/enable`、`compliance add`、`credential set/delete`、`security register/map`、`ingest start/resume/show`、`snapshot create/confirm`、`ai-provider-list`、`ai-analyze`、`ai-workflow`、`query`、`analyze`、`backtest run`、`research replay/diff`、`backup create/verify`、`restore`、`migrate`。`ai-analyze` 与 `ai-workflow` 可选 `--provider`；未填时使用 local evidence reasoner。所有查询命令支持 `--json`；secret 只通过隐藏输入或 stdin/file descriptor 读取，不接受命令行参数，避免 shell history 泄漏。无任何 order/broker 命令。
 
 ### Python 只读客户端
 

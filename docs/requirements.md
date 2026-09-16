@@ -335,3 +335,9 @@
 4. WHEN the AI_Research_Assistant returns a finding, THE AI_Research_Assistant SHALL include the model identifier, model version, prompt_template version, reasoning rule-set version, snapshot identifier, entity, filters, observation count, content-addressed analysis identifier, and at least one evidence reference.
 5. IF no applicable numeric value or no matching observation is available, THEN THE AI_Research_Assistant SHALL return an insufficient-evidence result without inventing an external-market conclusion.
 6. THE default AI_Research_Assistant SHALL perform zero outbound network requests and SHALL not receive credentials or secret material.
+7. WHEN the Local_User requests an AI workflow, THE AI_Research_Assistant SHALL execute the fixed stages `INGESTION_READINESS`, `DATA_QUALITY`, `RESEARCH_REVIEW`, `RISK_DECISION`, and `REPORT_BRIEFING` in order for one pinned Data_Snapshot.
+8. WHEN a workflow stage fails, THE AI_Research_Assistant SHALL return the failure without registering a workflow artifact.
+9. WHEN an AI workflow succeeds, THE AI_Research_Assistant SHALL return a content-addressed workflow identifier, provider identifier, snapshot identifier, stable stage identifiers, and the content-addressed analysis identifier of every completed stage.
+10. WHEN the Local_User supplies an AI provider identifier, THE Platform SHALL select only a provider registered in the AI provider registry; an unknown identifier SHALL fail before any provider call.
+11. THE Platform SHALL allow a remote AI provider only by explicit registration and SHALL not register any outbound-capable provider by default.
+12. WHEN a remote AI provider is used, THE Platform SHALL send no credentials file content, database connection string, local filesystem path, raw provider response, or rows outside the bounded research-query result; locally computed findings, metrics, and evidence references SHALL remain platform-owned.

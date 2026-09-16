@@ -4,10 +4,14 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from stock_platform.application.ai import AIResearchProvider
+from stock_platform.application.ai import (
+    AI_RESEARCH_PROVIDER_ID,
+    AIProviderRegistry,
+    AIResearchProvider,
+)
 from stock_platform.application.backup import BackupPlatformState
 from stock_platform.application.status import StatusDiagnostics
-from stock_platform.domain.ai import AIAnalysisArtifact
+from stock_platform.domain.ai import AIAnalysisArtifact, AIWorkflowArtifact
 from stock_platform.domain.research import DataSnapshotManifest, data_snapshot_id
 
 type ProviderName = str
@@ -46,7 +50,14 @@ class ApplicationContainer:
     snapshots: dict[str, DataSnapshotManifest] = field(default_factory=dict)
     reject_confirmations: set[str] = field(default_factory=set)
     ai_reasoner: AIResearchProvider | None = None
+    ai_provider_registry: AIProviderRegistry = field(
+        default_factory=lambda: AIProviderRegistry(
+            providers=(),
+            default_provider_id=AI_RESEARCH_PROVIDER_ID,
+        )
+    )
     ai_results: dict[str, AIAnalysisArtifact] = field(default_factory=dict)
+    ai_workflows: dict[str, AIWorkflowArtifact] = field(default_factory=dict)
 
     def status(self) -> StatusDiagnostics:
         """Return the summary diagnostics exposed through local APIs."""
@@ -99,11 +110,29 @@ class ApplicationContainer:
         self.ai_results[artifact.analysis_id] = artifact
         return artifact.analysis_id
 
+    def record_ai_workflow(self, artifact: AIWorkflowArtifact) -> str:
+        """Register one content-addressed workflow in local audit state."""
+        self.ai_workflows[artifact.workflow_id] = artifact
+        return artifact.workflow_id
+
+    def register_ai_provider(
+        self, provider_id: str, provider: AIResearchProvider
+    ) -> AIProviderRegistry:
+        """Install one named AI provider without enabling outbound calls."""
+        self.ai_provider_registry = self.ai_provider_registry.with_provider(
+            provider_id, provider
+        )
+        return self.ai_provider_registry
+
     def require_ai_reasoner(self) -> AIResearchProvider:
         """Reject AI composition before accepting any user request."""
         if self.ai_reasoner is None:
             raise LookupError("AI reasoner is not installed")
         return self.ai_reasoner
+
+    def installed_ai_provider_ids(self) -> tuple[str, ...]:
+        """Expose a stable provider selection list to local interfaces."""
+        return self.ai_provider_registry.provider_ids()
 
     def backup_platform_state(self) -> BackupPlatformState:
         """Build the local backup inventory source from current state."""
@@ -117,6 +146,6 @@ class ApplicationContainer:
             quality_reports=(),
             snapshot_ids=tuple(self.snapshots),
             manifests=(),
-            research_results=tuple(self.ai_results),
+            research_results=(*self.ai_results, *self.ai_workflows),
             credentials=tuple(self.credential_references),
         )

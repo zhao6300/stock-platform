@@ -8,6 +8,7 @@ from typing import Any
 from stock_platform.application.ai import (
     AIAnalysisRequest,
     AIArtifactBuildIssue,
+    AIResearchProvider,
     execute_ai_analysis,
 )
 from stock_platform.application.queries import (
@@ -27,7 +28,7 @@ class SnapshotResearchClient:
 
     snapshot_id: str
     catalog: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]]
-    reasoner: LocalEvidenceReasoner = field(default_factory=LocalEvidenceReasoner)
+    reasoner: AIResearchProvider = field(default_factory=LocalEvidenceReasoner)
 
     def query(self, query: ResearchQuery) -> ResearchQueryResult:
         """Run through the application layer with the pinned catalog."""
